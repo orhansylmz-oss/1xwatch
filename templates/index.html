@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1XWATCH</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#060608;color:#dde;font-family:'IBM Plex Mono',monospace;font-size:13px;min-height:100vh}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#222}
+  button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
+  input{outline:none;font:inherit}
+  header{position:sticky;top:0;z-index:50;background:rgba(6,6,8,.97);border-bottom:1px solid #1a1a22;backdrop-filter:blur(12px)}
+  .hbar{max-width:760px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:16px}
+  .logo{font-size:18px;font-weight:700;letter-spacing:-1px;flex-shrink:0}
+  .logo span{color:#2eff7a}
+  .status{flex:1;display:flex;align-items:center;gap:8px}
+  .dot{width:7px;height:7px;border-radius:50%;background:#2eff7a;animation:glow 1.5s ease-in-out infinite}
+  .status-txt{font-size:10px;color:#2eff7a;letter-spacing:1px}
+  #btn-start{padding:6px 14px;border:1px solid #333;color:#444;font-size:10px;letter-spacing:1.5px;transition:all .2s}
+  #btn-start.ready{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  #btn-start.live{border-color:#ff4d4d;color:#ff4d4d;background:rgba(255,77,77,.08)}
+  .tabs{max-width:760px;margin:0 auto;padding:0 16px;display:flex;border-top:1px solid #111}
+  .tab{padding:8px 14px;font-size:10px;letter-spacing:1px;border-bottom:2px solid transparent;color:#555;transition:all .15s}
+  .tab.active{border-color:#2eff7a;color:#2eff7a}
+  .badge{margin-left:4px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.25);color:#2eff7a;padding:1px 5px;font-size:8px;letter-spacing:1px}
+  main{max-width:760px;margin:0 auto;padding:20px 16px}
+  .page{display:none}.page.active{display:block}
+  .alert-bar{margin-bottom:16px;padding:10px 14px;background:rgba(255,200,60,.05);border:1px solid rgba(255,200,60,.2);display:flex;justify-content:space-between;align-items:center}
+  .alert-bar span{font-size:10px;color:#aaa}
+  .alert-bar button{font-size:10px;padding:3px 10px;border:1px solid rgba(255,200,60,.4);color:#ffc83c;letter-spacing:1px}
+  .match-card{background:#0c0c10;border:1px solid #161620;margin-bottom:8px;transition:border-color .2s}
+  .match-card.watched{border-color:rgba(46,255,122,.2)}
+  .match-head{padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+  .match-names{flex:1}
+  .match-title{font-size:12px;color:#bbb}
+  .match-card.watched .match-title{color:#fff;font-weight:600}
+  .match-meta{font-size:9px;color:#444;margin-top:3px}
+  .sel-badge{font-size:9px;padding:2px 6px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.25);color:#2eff7a;letter-spacing:1px;flex-shrink:0}
+  .chevron{color:#333;font-size:9px}
+  .markets{padding:0 14px 14px;border-top:1px solid #111;display:none}
+  .markets.open{display:block}
+  .markets-label{font-size:9px;color:#333;letter-spacing:1px;margin:10px 0 8px}
+  .market-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .mkt{padding:10px 6px;border:1px solid #1a1a22;color:#3a3a4a;text-align:center;line-height:1.5;transition:all .15s;cursor:pointer}
+  .mkt.active{border-color:rgba(46,255,122,.35);color:rgba(46,255,122,.8);background:rgba(46,255,122,.05)}
+  .mkt.opened{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  .mkt-icon{font-size:16px;margin-bottom:3px}
+  .mkt-label{font-size:9px}
+  .mkt-sub{font-size:8px;margin-top:3px;color:rgba(46,255,122,.4)}
+  .mkt.opened .mkt-sub{color:#2eff7a;letter-spacing:1px}
+  .loading{text-align:center;padding:40px;color:#333;font-size:11px}
+  .spinner{display:inline-block;width:20px;height:20px;border:2px solid #222;border-top-color:#2eff7a;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+  .log-item{padding:10px 14px;background:#0c0c10;border:1px solid rgba(46,255,122,.15);display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .log-icon{font-size:18px}
+  .log-info{flex:1}
+  .log-market{font-size:11px;color:#e0e0ee}
+  .log-sent{color:#2eff7a;font-size:9px;letter-spacing:1px;margin-left:8px}
+  .log-match{font-size:10px;color:#555;margin-top:2px}
+  .log-time{font-size:10px;color:#333;flex-shrink:0}
+  .empty{text-align:center;padding:60px 20px;color:#333;font-size:12px}
+  .empty-icon{font-size:36px;margin-bottom:12px;opacity:.3}
+  .config-box{padding:20px;background:#0c0c10;border:1px solid #1e1e28;margin-bottom:16px}
+  .config-title{font-size:11px;color:#2eff7a;letter-spacing:2px;margin-bottom:20px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:9px;color:#555;letter-spacing:1px;margin-bottom:6px}
+  .field input{width:100%;padding:8px 12px;background:#0a0a0d;border:1px solid #222;color:#e0e0ee;font-size:11px;font-family:inherit}
+  .freq-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .freq-btn{padding:6px 12px;font-size:10px;border:1px solid #222;color:#555;transition:all .15s}
+  .freq-btn.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-test{padding:8px 18px;font-size:10px;letter-spacing:1.5px;border:1px solid #333;color:#666;transition:all .2s}
+  .btn-test.ok{border-color:#2eff7a;color:#2eff7a}
+  .btn-test.err{border-color:#ff4d4d;color:#ff4d4d}
+  .test-err{margin-top:10px;font-size:10px;color:#ff4d4d;line-height:1.5}
+  .preview-box{padding:16px;background:#0c0c10;border:1px solid #1e1e28}
+  .preview-label{font-size:9px;color:#444;letter-spacing:1px;margin-bottom:12px}
+  .tg-msg{padding:14px;background:#17212b;border-radius:4px;border-left:3px solid #2eff7a;font-size:12px;line-height:1.8;color:#ccc}
+  .refresh-btn{float:right;font-size:9px;padding:3px 10px;border:1px solid #222;color:#555;letter-spacing:1px;margin-bottom:12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes glow{0%,100%{box-shadow:0 0 6px #2eff7a44}50%{box-shadow:0 0 18px #2eff7a88}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="logo">1X<span>WATCH</span></div>
+    <div class="status" id="status-bar" style="display:none">
+      <div class="dot"></div>
+      <span class="status-txt">CANLI · <span id="last-check">—</span></span>
+    </div>
+    <div style="flex:1"></div>
+    <button id="btn-start" onclick="toggleMonitor()">▶ BAŞLAT</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showPage('fixtures',event)">Fikstür</button>
+    <button class="tab" onclick="showPage('log',event)" id="tab-log">Bildirimler</button>
+    <button class="tab" onclick="showPage('config',event)" id="tab-config">⚙ Telegram</button>
+  </div>
+</header>
+<main>
+  <div class="page active" id="page-fixtures">
+    <div id="no-config-bar" class="alert-bar" style="display:none">
+      <span>⚠ Önce Telegram ayarlarını yap</span>
+      <button onclick="showPage('config',event)">AYARLA →</button>
+    </div>
+    <button class="refresh-btn" onclick="refreshFixtures()">↻ YENİLE</button>
+    <div style="clear:both"></div>
+    <div id="fixtures-list">
+      <div class="loading"><div class="spinner"></div><br>Maçlar yükleniyor...</div>
+    </div>
+  </div>
+  <div class="page" id="page-log">
+    <div id="log-list">
+      <div class="empty"><div class="empty-icon">📭</div>Henüz bildirim yok</div>
+    </div>
+  </div>
+  <div class="page" id="page-config">
+    <div class="config-box">
+      <div class="config-title">TELEGRAM BOT AYARLARI</div>
+      <div class="field">
+        <label>BOT TOKEN</label>
+        <input id="cfg-token" type="password" placeholder="Railway'de TG_TOKEN olarak tanımlı" readonly style="color:#555;cursor:default">
+      </div>
+      <div class="field">
+        <label>CHAT ID</label>
+        <input id="cfg-chat" type="text" placeholder="Railway'de TG_CHAT olarak tanımlı" readonly style="color:#555;cursor:default">
+      </div>
+      <div style="font-size:9px;color:#444;letter-spacing:1px;margin-bottom:12px">KONTROL SIKLIĞI</div>
+      <div class="freq-btns">
+        <button class="freq-btn" onclick="setFreq(30,event)">30 sn</button>
+        <button class="freq-btn active" onclick="setFreq(60,event)">1 dk</button>
+        <button class="freq-btn" onclick="setFreq(120,event)">2 dk</button>
+        <button class="freq-btn" onclick="setFreq(300,event)">5 dk</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn-test" id="btn-test" onclick="testTelegram()">📨 TEST MESAJI GÖNDER</button>
+      </div>
+      <div id="test-err" class="test-err" style="display:none"></div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-label">ÖRNEK BİLDİRİM</div>
+      <div class="tg-msg">
+        ⚽ <b>BAHİS SECENEGI ACILDI!</b><br><br>
+        🏟 <b>Wolverhampton vs Liverpool</b><br>
+        🏆 Premier Lig<br>
+        🟨 <b>Faul Sayisi</b> secenegi artik mevcut!<br>
+        ⏰ <span id="preview-time"></span><br><br>
+        🔗 1xbet'e gir ve bahsini yap!
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const MARKETS = [
+  {key:"fouls",    label:"Faul Sayisi",       icon:"🟨"},
+  {key:"offsides", label:"Ofsayt",             icon:"🚩"},
+  {key:"shots",    label:"Sut / Isabetli Sut", icon:"🎯"},
+  {key:"corners",  label:"Korner",             icon:"📐"},
+  {key:"cards",    label:"Kart",               icon:"🃏"},
+  {key:"bookings", label:"Ceza Puani",         icon:"📋"},
+];
+
+let fixtures=[], watchedUI={}, openedUI={}, monitoring=false, pollTimer=null;
+
+function showPage(name, e) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(e) e.target.classList.add('active');
+}
+
+async function loadFixtures() {
+  const res = await fetch('/api/fixtures');
+  fixtures = await res.json();
+  renderFixtures();
+}
+
+async function refreshFixtures() {
+  document.getElementById('fixtures-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Yenileniyor...</div>';
+  await fetch('/api/fixtures/refresh',{method:'POST'});
+  await loadFixtures();
+}
+
+function renderFixtures() {
+  const el = document.getElementById('fixtures-list');
+  if (!fixtures.length) {
+    el.innerHTML='<div class="empty"><div class="empty-icon">📅</div>Mac bulunamadi<br><span style="font-size:10px;color:#2a2a2a">Yenile butonuna bas</span></div>';
+    return;
+  }
+  el.innerHTML = fixtures.map(m => matchCard(m)).join('');
+}
+
+function matchCard(m) {
+  const w = watchedUI[m.id] || new Set();
+  const watched = w.size > 0;
+  return `<div class="match-card ${watched?'watched':''}" id="card-${m.id}">
+    <div class="match-head" onclick="toggleCard('${m.id}')">
+      <div class="match-names">
+        <div class="match-title">${m.home} <span style="color:#333">–</span> ${m.away}</div>
+        <div class="match-meta">${m.league} · ${m.kickoff}</div>
+      </div>
+      ${watched?`<div class="sel-badge">${w.size} SECILI</div>`:''}
+      <span class="chevron" id="chev-${m.id}">▼</span>
+    </div>
+    <div class="markets" id="mkt-${m.id}">
+      <div class="markets-label">IZLENECEK BAHIS SECENEKLERI</div>
+      <div class="market-grid">
+        ${MARKETS.map(mk=>{
+          const active=w.has(mk.key);
+          const opened=openedUI[m.id+'_'+mk.key];
+          const cls=opened?'opened':active?'active':'';
+          const sub=opened?'✓ ACILDI':active?'izleniyor':'';
+          return `<div class="mkt ${cls}" onclick="toggleMarket('${m.id}','${mk.key}')">
+            <div class="mkt-icon">${mk.icon}</div>
+            <div class="mkt-label">${mk.label}</div>
+            <div class="mkt-sub">${sub}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(mid) {
+  const mkt=document.getElementById('mkt-'+mid);
+  const chev=document.getElementById('chev-'+mid);
+  chev.textContent=mkt.classList.toggle('open')?'▲':'▼';
+}
+
+async function toggleMarket(mid, key) {
+  if(!watchedUI[mid]) watchedUI[mid]=new Set();
+  const has=watchedUI[mid].has(key);
+  has?watchedUI[mid].delete(key):watchedUI[mid].add(key);
+  if(!watchedUI[mid].size) delete watchedUI[mid];
+  await fetch('/api/watch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({match_id:mid,market_key:key,active:!has})});
+  const card=document.getElementById('card-'+mid);
+  const match=fixtures.find(f=>f.id===mid);
+  if(card&&match) card.outerHTML=matchCard(match);
+}
+
+async function toggleMonitor() {
+  const action=monitoring?'stop':'start';
+  await fetch('/api/monitor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});
+  monitoring=!monitoring;
+  const btn=document.getElementById('btn-start');
+  const bar=document.getElementById('status-bar');
+  if(monitoring){btn.textContent='◼ DURDUR';btn.className='live';bar.style.display='flex';startPoll();}
+  else{btn.textContent='▶ BAŞLAT';btn.className='ready';bar.style.display='none';stopPoll();}
+}
+
+function startPoll(){pollTimer=setInterval(pollState,5000);pollState();}
+function stopPoll(){clearInterval(pollTimer);}
+
+async function pollState() {
+  const res=await fetch('/api/state');
+  const data=await res.json();
+  document.getElementById('last-check').textContent=data.last_check||'—';
+  data.log.forEach(entry=>{
+    const key=entry.match+'_'+entry.market;
+    if(!openedUI[key]){openedUI[key]=true;renderFixtures();}
+  });
+  renderLog(data.log);
+  if(data.log.length) document.getElementById('tab-log').innerHTML=`Bildirimler <span class="badge">${data.log.length}</span>`;
+}
+
+function renderLog(log) {
+  const el=document.getElementById('log-list');
+  if(!log.length) return;
+  el.innerHTML=log.map(e=>`<div class="log-item">
+    <div class="log-icon">${e.icon}</div>
+    <div class="log-info">
+      <div class="log-market">${e.market}<span class="log-sent">→ TELEGRAM'A GONDERILDI</span></div>
+      <div class="log-match">${e.match}</div>
+    </div>
+    <div class="log-time">${e.time}</div>
+  </div>`).join('');
+}
+
+async function setFreq(s,e) {
+  document.querySelectorAll('.freq-btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  await fetch('/api/interval',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seconds:s})});
+}
+
+async function testTelegram() {
+  const btn=document.getElementById('btn-test');
+  const err=document.getElementById('test-err');
+  btn.textContent='⏳ GONDERILIYOR...';err.style.display='none';
+  try {
+    const res=await fetch('/api/test-telegram',{method:'POST'});
+    const data=await res.json();
+    if(data.ok){btn.textContent="✓ TELEGRAM'A GELDI!";btn.className='btn-test ok';}
+    else throw new Error(data.error);
+  } catch(e) {
+    btn.textContent='✗ HATA';btn.className='btn-test err';
+    err.style.display='block';err.textContent='Hata: '+e.message;
+  }
+  setTimeout(()=>{btn.textContent='📨 TEST MESAJI GONDER';btn.className='btn-test';},4000);
+}
+
+async function loadConfig() {
+  const res=await fetch('/api/config');
+  const data=await res.json();
+  document.getElementById('cfg-token').placeholder=data.has_token?`✓ Token tanimli (${data.token_preview})`:"Railway'de TG_TOKEN tanimlanmamis!";
+  document.getElementById('cfg-chat').value=data.chat_id||'';
+  if(!data.has_token||!data.has_chat){
+    document.getElementById('no-config-bar').style.display='flex';
+    document.getElementById('btn-start').disabled=true;
+  } else {
+    document.getElementById('btn-start').className='ready';
+  }
+  document.getElementById('tab-config').innerHTML=`⚙ Telegram${data.has_token&&data.has_chat?' ✓':''}`;
+  document.getElementById('preview-time').textContent=new Date().toLocaleTimeString('tr-TR');
+}
+
+loadConfig();
+loadFixtures();
+</script>
+</body>
+</html>
