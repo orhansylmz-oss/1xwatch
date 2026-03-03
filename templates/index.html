@@ -27,19 +27,10 @@
   .badge{margin-left:4px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.25);color:#2eff7a;padding:1px 5px;font-size:8px}
   main{max-width:800px;margin:0 auto;padding:20px 16px}
   .page{display:none}.page.active{display:block}
-  /* ADD MATCH */
-  .add-box{background:#0c0c10;border:1px solid #1e1e28;padding:16px;margin-bottom:16px}
-  .add-title{font-size:9px;color:#2eff7a;letter-spacing:2px;margin-bottom:12px}
-  .add-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
-  .add-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
-  .add-field label{font-size:8px;color:#444;letter-spacing:1px}
-  .add-field input{padding:7px 10px;background:#0a0a0d;border:1px solid #222;color:#e0e0ee;font-size:11px;font-family:inherit;width:100%}
-  .add-field input:focus{border-color:#2eff7a44}
-  .btn-add{padding:7px 16px;border:1px solid #2eff7a;color:#2eff7a;background:rgba(46,255,122,.08);font-size:10px;letter-spacing:1px;white-space:nowrap;flex-shrink:0}
-  .btn-add:disabled{opacity:.4;cursor:default}
-  .add-hint{font-size:9px;color:#333;margin-top:8px;line-height:1.6}
-  .add-hint a{color:#555;text-decoration:none}
-  /* MATCH CARD */
+  .domain-bar{margin-bottom:12px;padding:8px 12px;background:rgba(46,255,122,.04);border:1px solid rgba(46,255,122,.1);display:flex;align-items:center;justify-content:space-between;font-size:9px}
+  .domain-txt{color:#444}
+  .domain-txt span{color:#2eff7a}
+  .btn-refresh{font-size:9px;padding:3px 10px;border:1px solid #222;color:#555;letter-spacing:1px}
   .match-card{background:#0c0c10;border:1px solid #161620;margin-bottom:8px;transition:border-color .2s}
   .match-card.watched{border-color:rgba(46,255,122,.2)}
   .match-head{padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
@@ -48,8 +39,6 @@
   .match-card.watched .match-title{color:#fff;font-weight:600}
   .match-meta{font-size:9px;color:#444;margin-top:3px}
   .sel-badge{font-size:9px;padding:2px 6px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.25);color:#2eff7a;letter-spacing:1px;flex-shrink:0}
-  .btn-remove{font-size:9px;padding:2px 8px;border:1px solid #ff4d4d22;color:#ff4d4d44;transition:all .15s}
-  .btn-remove:hover{border-color:#ff4d4d;color:#ff4d4d}
   .chevron{color:#333;font-size:9px}
   .markets{padding:0 14px 14px;border-top:1px solid #111;display:none}
   .markets.open{display:block}
@@ -62,6 +51,8 @@
   .mkt-label{font-size:9px}
   .mkt-sub{font-size:8px;margin-top:3px;color:rgba(46,255,122,.4)}
   .mkt.opened .mkt-sub{color:#2eff7a;letter-spacing:1px}
+  .loading{text-align:center;padding:40px;color:#333;font-size:11px}
+  .spinner{display:inline-block;width:18px;height:18px;border:2px solid #222;border-top-color:#2eff7a;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
   .empty{text-align:center;padding:40px 20px;color:#333;font-size:11px}
   .empty-icon{font-size:32px;margin-bottom:10px;opacity:.3}
   .log-item{padding:10px 14px;background:#0c0c10;border:1px solid rgba(46,255,122,.15);display:flex;align-items:center;gap:12px;margin-bottom:6px}
@@ -88,8 +79,6 @@
   .tg-msg{padding:14px;background:#17212b;border-radius:4px;border-left:3px solid #2eff7a;font-size:12px;line-height:1.8;color:#ccc}
   @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes glow{0%,100%{box-shadow:0 0 6px #2eff7a44}50%{box-shadow:0 0 18px #2eff7a88}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  .spinner{display:inline-block;width:16px;height:16px;border:2px solid #222;border-top-color:#2eff7a;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
 </style>
 </head>
 <body>
@@ -104,61 +93,32 @@
     <button id="btn-start" onclick="toggleMonitor()">▶ BAŞLAT</button>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="showPage('matches',event)">Maclar</button>
+    <button class="tab active" onclick="showPage('fixtures',event)">Fikstür</button>
     <button class="tab" onclick="showPage('log',event)" id="tab-log">Bildirimler</button>
     <button class="tab" onclick="showPage('config',event)" id="tab-config">Telegram</button>
   </div>
 </header>
 <main>
-  <!-- MACLAR -->
-  <div class="page active" id="page-matches">
-    <div class="add-box">
-      <div class="add-title">MAC EKLE</div>
-      <div class="add-row">
-        <div class="add-field" style="max-width:160px">
-          <label>1XBET MAC ID</label>
-          <input id="inp-id" placeholder="örn: 123456789" oninput="validateAdd()">
-        </div>
-        <div class="add-field">
-          <label>EV SAHİBİ (opsiyonel)</label>
-          <input id="inp-home" placeholder="Wolverhampton">
-        </div>
-        <div class="add-field">
-          <label>DEPLASMaN (opsiyonel)</label>
-          <input id="inp-away" placeholder="Liverpool">
-        </div>
-        <div class="add-field" style="max-width:120px">
-          <label>LİG</label>
-          <input id="inp-league" placeholder="Premier Lig">
-        </div>
-        <button class="btn-add" id="btn-add" onclick="addMatch()" disabled>+ EKLE</button>
-      </div>
-      <div class="add-hint">
-        💡 <b style="color:#555">Mac ID nasıl bulunur:</b>
-        1xbet'te maca tıkla → tarayıcı adres çubuğunda
-        <code style="color:#2eff7a">/live/football/...</code> veya
-        <code style="color:#2eff7a">/line/football/...</code> sonundaki sayı = Mac ID<br>
-        Örnek: <code style="color:#888">https://1xbet.com/en/line/football/123456-wolves-liverpool</code>
-        → ID: <code style="color:#2eff7a">123456</code>
-      </div>
+  <div class="page active" id="page-fixtures">
+    <div class="domain-bar">
+      <span class="domain-txt">Domain: <span id="domain-txt">taranıyor...</span></span>
+      <button class="btn-refresh" onclick="refreshFixtures()">↻ YENİLE</button>
     </div>
-    <div id="matches-list">
-      <div class="empty"><div class="empty-icon">📋</div>Henüz mac eklenmedi<br><span style="font-size:10px;color:#2a2a2a">Yukarıdan 1xbet mac ID'si girerek ekle</span></div>
+    <div id="fixtures-list">
+      <div class="loading"><div class="spinner"></div><br>Maclar yukleniyor...</div>
     </div>
   </div>
-  <!-- BILDIRIMLER -->
   <div class="page" id="page-log">
     <div id="log-list">
       <div class="empty"><div class="empty-icon">📭</div>Henüz bildirim yok</div>
     </div>
   </div>
-  <!-- TELEGRAM -->
   <div class="page" id="page-config">
     <div class="config-box">
       <div class="config-title">TELEGRAM AYARLARI</div>
       <div class="field">
         <label>BOT TOKEN</label>
-        <input id="cfg-token" type="password" placeholder="Railway'de TG_TOKEN olarak tanimli" readonly style="color:#555;cursor:default">
+        <input id="cfg-token" type="password" placeholder="Railway'de TG_TOKEN tanimli" readonly style="color:#555;cursor:default">
       </div>
       <div class="field">
         <label>CHAT ID</label>
@@ -187,70 +147,56 @@
   </div>
 </main>
 <script>
-const MARKETS = [
-  {key:"fouls",    label:"Faul Sayisi", icon:"🟨"},
-  {key:"offsides", label:"Ofsayt",      icon:"🚩"},
-  {key:"shots",    label:"Sut",         icon:"🎯"},
-  {key:"corners",  label:"Korner",      icon:"📐"},
-  {key:"cards",    label:"Kart",        icon:"🃏"},
-  {key:"bookings", label:"Ceza Puani",  icon:"📋"},
+const MARKETS=[
+  {key:"fouls",label:"Faul Sayisi",icon:"🟨"},
+  {key:"offsides",label:"Ofsayt",icon:"🚩"},
+  {key:"shots",label:"Sut",icon:"🎯"},
+  {key:"corners",label:"Korner",icon:"📐"},
+  {key:"cards",label:"Kart",icon:"🃏"},
+  {key:"bookings",label:"Ceza Puani",icon:"📋"},
 ];
 
-let matches=[], watchedUI={}, openedUI={}, monitoring=false, pollTimer=null;
+let fixtures=[],watchedUI={},openedUI={},monitoring=false,pollTimer=null;
 
 function showPage(name,e){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  if(e) e.target.classList.add('active');
+  if(e)e.target.classList.add('active');
 }
 
-function validateAdd(){
-  const v = document.getElementById('inp-id').value.trim();
-  document.getElementById('btn-add').disabled = !/^\d{5,12}$/.test(v);
+async function loadFixtures(){
+  document.getElementById('fixtures-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Maclar yukleniyor...</div>';
+  try{
+    const res=await fetch('/api/fixtures');
+    fixtures=await res.json();
+    renderFixtures();
+  }catch(e){
+    document.getElementById('fixtures-list').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Baglanti hatasi<br><span style="font-size:10px;color:#2a2a2a">Yenile butonuna bas</span></div>';
+  }
 }
 
-async function addMatch(){
-  const btn = document.getElementById('btn-add');
-  const id  = document.getElementById('inp-id').value.trim();
-  const home = document.getElementById('inp-home').value.trim();
-  const away = document.getElementById('inp-away').value.trim();
-  const league = document.getElementById('inp-league').value.trim();
-  btn.disabled=true; btn.textContent='⏳ EKLENİYOR...';
-  try {
-    const res = await fetch('/api/matches/add',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({id,home:home||'?',away:away||'?',league})
-    });
-    const data = await res.json();
-    if(data.ok){
-      matches.push(data.match);
-      renderMatches();
-      document.getElementById('inp-id').value='';
-      document.getElementById('inp-home').value='';
-      document.getElementById('inp-away').value='';
-      document.getElementById('inp-league').value='';
-    } else {
-      alert(data.error||'Hata');
-    }
-  } catch(e){ alert('Baglanti hatasi'); }
-  btn.textContent='+ EKLE';
+async function refreshFixtures(){
+  document.getElementById('fixtures-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Yenileniyor...</div>';
+  document.getElementById('domain-txt').textContent='taranıyor...';
+  try{
+    const res=await fetch('/api/fixtures/refresh',{method:'POST'});
+    const data=await res.json();
+    if(data.domain) document.getElementById('domain-txt').textContent=data.domain;
+    fixtures=await (await fetch('/api/fixtures')).json();
+    renderFixtures();
+  }catch(e){
+    document.getElementById('fixtures-list').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Hata olustu</div>';
+  }
 }
 
-async function removeMatch(mid){
-  await fetch('/api/matches/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:mid})});
-  matches = matches.filter(m=>m.id!==mid);
-  delete watchedUI[mid];
-  renderMatches();
-}
-
-function renderMatches(){
-  const el = document.getElementById('matches-list');
-  if(!matches.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>Henüz mac eklenmedi<br><span style="font-size:10px;color:#2a2a2a">Yukarıdan 1xbet mac ID\'si girerek ekle</span></div>';
+function renderFixtures(){
+  const el=document.getElementById('fixtures-list');
+  if(!fixtures.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📅</div>Mac bulunamadi<br><span style="font-size:10px;color:#2a2a2a">Yenile butonuna bas veya domain degismis olabilir</span></div>';
     return;
   }
-  el.innerHTML = matches.map(m=>matchCard(m)).join('');
+  el.innerHTML=fixtures.map(m=>matchCard(m)).join('');
 }
 
 function matchCard(m){
@@ -260,14 +206,13 @@ function matchCard(m){
     <div class="match-head" onclick="toggleCard('${m.id}')">
       <div class="match-names">
         <div class="match-title">${m.home} <span style="color:#333">–</span> ${m.away}</div>
-        <div class="match-meta">${m.league||''}${m.league&&m.kickoff?' · ':''}${m.kickoff||''} <span style="color:#333">· ID: ${m.id}</span></div>
+        <div class="match-meta">${m.league} · ${m.kickoff}</div>
       </div>
-      ${watched?`<div class="sel-badge">${w.size} SECİLİ</div>`:''}
-      <button class="btn-remove" onclick="event.stopPropagation();removeMatch('${m.id}')">✕</button>
+      ${watched?`<div class="sel-badge">${w.size} SECILI</div>`:''}
       <span class="chevron" id="chev-${m.id}">▼</span>
     </div>
     <div class="markets" id="mkt-${m.id}">
-      <div class="markets-label">İZLENECEK BAHİS SEÇENEKLERİ</div>
+      <div class="markets-label">IZLENECEK BAHIS SECENEKLERI</div>
       <div class="market-grid">
         ${MARKETS.map(mk=>{
           const active=w.has(mk.key);
@@ -292,14 +237,14 @@ function toggleCard(mid){
 }
 
 async function toggleMarket(mid,key){
-  if(!watchedUI[mid]) watchedUI[mid]=new Set();
+  if(!watchedUI[mid])watchedUI[mid]=new Set();
   const has=watchedUI[mid].has(key);
   has?watchedUI[mid].delete(key):watchedUI[mid].add(key);
-  if(!watchedUI[mid].size) delete watchedUI[mid];
+  if(!watchedUI[mid].size)delete watchedUI[mid];
   await fetch('/api/watch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({match_id:mid,market_key:key,active:!has})});
   const card=document.getElementById('card-'+mid);
-  const match=matches.find(f=>f.id===mid);
-  if(card&&match) card.outerHTML=matchCard(match);
+  const match=fixtures.find(f=>f.id===mid);
+  if(card&&match)card.outerHTML=matchCard(match);
 }
 
 async function toggleMonitor(){
@@ -316,24 +261,27 @@ function startPoll(){pollTimer=setInterval(pollState,5000);pollState();}
 function stopPoll(){clearInterval(pollTimer);}
 
 async function pollState(){
-  const res=await fetch('/api/state');
-  const data=await res.json();
-  document.getElementById('last-check').textContent=data.last_check||'—';
-  data.log.forEach(entry=>{
-    const key=entry.match+'_'+entry.market;
-    if(!openedUI[key]){openedUI[key]=true;renderMatches();}
-  });
-  renderLog(data.log);
-  if(data.log.length) document.getElementById('tab-log').innerHTML=`Bildirimler <span class="badge">${data.log.length}</span>`;
+  try{
+    const res=await fetch('/api/state');
+    const data=await res.json();
+    document.getElementById('last-check').textContent=data.last_check||'—';
+    if(data.domain)document.getElementById('domain-txt').textContent=data.domain;
+    data.log.forEach(entry=>{
+      const key=entry.match+'_'+entry.market;
+      if(!openedUI[key]){openedUI[key]=true;renderFixtures();}
+    });
+    renderLog(data.log);
+    if(data.log.length)document.getElementById('tab-log').innerHTML=`Bildirimler <span class="badge">${data.log.length}</span>`;
+  }catch(e){}
 }
 
 function renderLog(log){
   const el=document.getElementById('log-list');
-  if(!log.length) return;
+  if(!log.length)return;
   el.innerHTML=log.map(e=>`<div class="log-item">
     <div class="log-icon">${e.icon}</div>
     <div class="log-info">
-      <div class="log-market">${e.market}<span class="log-sent"> → TELEGRAM'A GÖNDERİLDİ</span></div>
+      <div class="log-market">${e.market}<span class="log-sent"> → TELEGRAM'A GONDERILDI</span></div>
       <div class="log-match">${e.match}</div>
     </div>
     <div class="log-time">${e.time}</div>
@@ -349,11 +297,11 @@ async function setFreq(s,e){
 async function testTelegram(){
   const btn=document.getElementById('btn-test');
   const err=document.getElementById('test-err');
-  btn.textContent='⏳ GÖNDERİLİYOR...'; err.style.display='none';
+  btn.textContent='⏳ GONDERILIYOR...';err.style.display='none';
   try{
     const res=await fetch('/api/test-telegram',{method:'POST'});
     const data=await res.json();
-    if(data.ok){btn.textContent="✓ TELEGRAM'A GELDİ!";btn.className='btn-test ok';}
+    if(data.ok){btn.textContent="✓ TELEGRAM'A GELDI!";btn.className='btn-test ok';}
     else throw new Error(data.error);
   }catch(e){
     btn.textContent='✗ HATA';btn.className='btn-test err';
@@ -372,14 +320,17 @@ async function loadConfig(){
   document.getElementById('preview-time').textContent=new Date().toLocaleTimeString('tr-TR');
 }
 
-async function loadMatches(){
-  const res=await fetch('/api/matches');
-  matches=await res.json();
-  renderMatches();
+async function loadState(){
+  try{
+    const res=await fetch('/api/state');
+    const data=await res.json();
+    if(data.domain)document.getElementById('domain-txt').textContent=data.domain;
+  }catch(e){}
 }
 
 loadConfig();
-loadMatches();
+loadState();
+loadFixtures();
 </script>
 </body>
 </html>
