@@ -1,4 +1,4 @@
-import os, time, requests, threading, logging
+import os, re, time, requests, threading, logging
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 
@@ -10,8 +10,8 @@ TG_TOKEN = os.environ.get("TG_TOKEN", "")
 TG_CHAT  = os.environ.get("TG_CHAT",  "")
 
 state = {
-    "watched":   {},
-    "notified":  {},
+    "watched":    {},
+    "notified":   {},
     "monitoring": False,
     "last_check": None,
     "log":        [],
@@ -31,19 +31,18 @@ MARKET_MAP = {
 
 LEAGUES = [
     ("Premier Lig", 1365),
-    ("La Liga", 2417),
-    ("Bundesliga", 1366),
-    ("Serie A", 1843),
-    ("Ligue 1", 2415),
+    ("La Liga",     2417),
+    ("Bundesliga",  1366),
+    ("Serie A",     1843),
+    ("Ligue 1",     2415),
 ]
 
-# Bilinen tüm 1xlite domain'leri - uygulama hepsini dener
 DOMAINS = [
+    "1xlite-51447.pro",
     "1xlite-989182.top",
     "1xlite-949285.top",
     "1xlite-628181.top",
     "1xlite-506423.top",
-    "1xlite-394299.top",
     "1xbet.com",
     "1xbet.co.ke",
     "1xbet.ng",
@@ -53,9 +52,7 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "application/json, text/plain, */*",
     "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.8",
-    "Accept-Encoding": "gzip, deflate, br",
     "Referer": "https://1xbet.com/",
-    "Origin": "https://1xbet.com",
 }
 
 def send_telegram(token, chat_id, text):
@@ -66,30 +63,47 @@ def send_telegram(token, chat_id, text):
         raise Exception(data.get("description", "Telegram hatasi"))
     return data
 
+def find_active_domain():
+    """Otomatik aktif 1xlite domain bul"""
+    try:
+        r = requests.get("https://1xbet.com/en/", headers=HEADERS, timeout=6, allow_redirects=True)
+        found = re.findall(r'1xlite-\d+\.[a-z]+', r.text)
+        if found:
+            log.info(f"Otomatik domain bulundu: {found[0]}")
+            return found[0]
+    except Exception as e:
+        log.debug(f"Otomatik domain bulunamadi: {e}")
+    return None
+
 def get_working_domain():
-    """Calisan domain bul ve cache'le"""
-    # Onceki calisan domain'i once dene
+    """Calisan domain bul ve cachele"""
+    # Once cache'deki domain'i dene
     if state["last_domain"]:
         try:
             url = f"https://{state['last_domain']}/LineFeed/GetSportsShortZip?sports=1&lng=EN&tf=10000&tz=0"
             r = requests.get(url, headers=HEADERS, timeout=5)
-            if r.status_code == 200 and r.json():
+            if r.status_code == 200:
                 return state["last_domain"]
         except:
             pass
+        state["last_domain"] = None
 
-    for domain in DOMAINS:
+    # Otomatik domain tespit
+    auto = find_active_domain()
+    domain_list = ([auto] if auto else []) + DOMAINS
+
+    for domain in domain_list:
+        if not domain:
+            continue
         try:
             url = f"https://{domain}/LineFeed/GetSportsShortZip?sports=1&lng=EN&tf=10000&tz=0"
             r = requests.get(url, headers=HEADERS, timeout=6)
-            if r.status_code == 200:
-                data = r.json()
-                if data and (data.get("Value") or data.get("OK")):
-                    log.info(f"Calisan domain bulundu: {domain}")
-                    state["last_domain"] = domain
-                    return domain
+            if r.status_code == 200 and r.json():
+                log.info(f"Aktif domain: {domain}")
+                state["last_domain"] = domain
+                return domain
         except Exception as e:
-            log.debug(f"{domain} basarisiz: {e}")
+            log.debug(f"{domain}: {e}")
     return None
 
 def fetch_fixtures():
@@ -105,8 +119,7 @@ def fetch_fixtures():
             r = requests.get(url, headers=HEADERS, timeout=10)
             if r.status_code != 200:
                 continue
-            data = r.json()
-            events = data.get("Value", []) or []
+            events = r.json().get("Value", []) or []
             for ev in events[:8]:
                 mid = str(ev.get("Id", ""))
                 home = ev.get("O1", "")
@@ -124,7 +137,7 @@ def fetch_fixtures():
             log.warning(f"{league_name} hatasi: {e}")
 
     fixtures.sort(key=lambda x: x["kickoff_ts"])
-    log.info(f"Toplam {len(fixtures)} mac yuklendi")
+    log.info(f"{len(fixtures)} mac yuklendi ({domain})")
     return fixtures
 
 def get_available_markets(match_id, domain=None):
@@ -139,10 +152,8 @@ def get_available_markets(match_id, domain=None):
         r = requests.get(url, headers=HEADERS, timeout=8)
         if r.status_code != 200:
             return []
-        data = r.json()
-        game = data.get("Value", {}) or {}
-        groups = game.get("GE", []) or []
-        group_ids = {g.get("G") for g in groups}
+        game = r.json().get("Value", {}) or {}
+        group_ids = {g.get("G") for g in (game.get("GE", []) or [])}
         return [k for k, ids in MARKET_MAP.items() if any(gid in group_ids for gid in ids)]
     except Exception as e:
         log.debug(f"Market check hatasi ({match_id}): {e}")
@@ -169,26 +180,29 @@ def _do_check():
             if alert_key in state["notified"] or mkey not in available:
                 continue
             labels = {
-                "fouls":    ("Faul Sayisi", "??"),
-                "offsides": ("Ofsayt", "??"),
-                "shots":    ("Sut", "??"),
-                "corners":  ("Korner", "??"),
-                "cards":    ("Kart", "??"),
-                "bookings": ("Ceza Puani", "??"),
+                "fouls":    ("Faul Sayisi", "🟨"),
+                "offsides": ("Ofsayt",      "🚩"),
+                "shots":    ("Sut",          "🎯"),
+                "corners":  ("Korner",       "📐"),
+                "cards":    ("Kart",         "🃏"),
+                "bookings": ("Ceza Puani",   "📋"),
             }
-            label, icon = labels.get(mkey, (mkey, "?"))
-            msg = (f"? <b>BAHIS SECENEGI ACILDI!</b>\n\n"
-                   f"?? <b>{match_name}</b>\n?? {league}\n"
+            label, icon = labels.get(mkey, (mkey, "⚽"))
+            msg = (f"⚽ <b>BAHIS SECENEGI ACILDI!</b>\n\n"
+                   f"🏟 <b>{match_name}</b>\n🏆 {league}\n"
                    f"{icon} <b>{label}</b> secenegi artik mevcut!\n"
-                   f"? {datetime.now().strftime('%H:%M:%S')}\n\n"
-                   f"?? 1xbet'e gir ve bahsini yap!")
+                   f"⏰ {datetime.now().strftime('%H:%M:%S')}\n\n"
+                   f"🔗 1xbet'e gir ve bahsini yap!")
             try:
                 send_telegram(TG_TOKEN, TG_CHAT, msg)
                 log.info(f"Bildirim: {match_name} - {label}")
             except Exception as e:
                 log.error(f"Telegram hatasi: {e}")
             state["notified"][alert_key] = True
-            state["log"].insert(0, {"match": match_name, "market": label, "icon": icon, "time": datetime.now().strftime("%H:%M:%S")})
+            state["log"].insert(0, {
+                "match": match_name, "market": label,
+                "icon": icon, "time": datetime.now().strftime("%H:%M:%S")
+            })
             state["log"] = state["log"][:100]
 
 @app.route("/")
@@ -211,16 +225,16 @@ def api_state():
     return jsonify({
         "monitoring": state["monitoring"],
         "last_check": state["last_check"],
-        "watched": {k: list(v) for k, v in state["watched"].items()},
-        "log": state["log"][:20],
-        "interval": state["interval"],
-        "domain": state["last_domain"],
+        "watched":    {k: list(v) for k, v in state["watched"].items()},
+        "log":        state["log"][:20],
+        "interval":   state["interval"],
+        "domain":     state["last_domain"],
     })
 
 @app.route("/api/watch", methods=["POST"])
 def api_watch():
     d = request.json
-    mid, mkey, active = str(d.get("match_id", "")), d.get("market_key", ""), d.get("active", True)
+    mid, mkey, active = str(d.get("match_id","")), d.get("market_key",""), d.get("active",True)
     if mid not in state["watched"]:
         state["watched"][mid] = set()
     if active:
@@ -249,7 +263,7 @@ def api_interval():
 @app.route("/api/test-telegram", methods=["POST"])
 def api_test_telegram():
     try:
-        send_telegram(TG_TOKEN, TG_CHAT, "? <b>1XWATCH test basarili!</b>\n\nBildirimler bu hesaba gelecek. ?")
+        send_telegram(TG_TOKEN, TG_CHAT, "✅ <b>1XWATCH test basarili!</b>\n\nBildirimler bu hesaba gelecek. ⚽")
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 400
@@ -258,7 +272,7 @@ def api_test_telegram():
 def api_config():
     return jsonify({
         "has_token": bool(TG_TOKEN),
-        "has_chat": bool(TG_CHAT),
+        "has_chat":  bool(TG_CHAT),
         "token_preview": TG_TOKEN[:8] + "..." if TG_TOKEN else "",
         "chat_id": TG_CHAT,
     })
