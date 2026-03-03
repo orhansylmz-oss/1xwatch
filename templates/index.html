@@ -186,3 +186,200 @@
     </div>
   </div>
 </main>
+<script>
+const MARKETS = [
+  {key:"fouls",    label:"Faul Sayisi", icon:"🟨"},
+  {key:"offsides", label:"Ofsayt",      icon:"🚩"},
+  {key:"shots",    label:"Sut",         icon:"🎯"},
+  {key:"corners",  label:"Korner",      icon:"📐"},
+  {key:"cards",    label:"Kart",        icon:"🃏"},
+  {key:"bookings", label:"Ceza Puani",  icon:"📋"},
+];
+
+let matches=[], watchedUI={}, openedUI={}, monitoring=false, pollTimer=null;
+
+function showPage(name,e){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(e) e.target.classList.add('active');
+}
+
+function validateAdd(){
+  const v = document.getElementById('inp-id').value.trim();
+  document.getElementById('btn-add').disabled = !/^\d{5,12}$/.test(v);
+}
+
+async function addMatch(){
+  const btn = document.getElementById('btn-add');
+  const id  = document.getElementById('inp-id').value.trim();
+  const home = document.getElementById('inp-home').value.trim();
+  const away = document.getElementById('inp-away').value.trim();
+  const league = document.getElementById('inp-league').value.trim();
+  btn.disabled=true; btn.textContent='⏳ EKLENİYOR...';
+  try {
+    const res = await fetch('/api/matches/add',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({id,home:home||'?',away:away||'?',league})
+    });
+    const data = await res.json();
+    if(data.ok){
+      matches.push(data.match);
+      renderMatches();
+      document.getElementById('inp-id').value='';
+      document.getElementById('inp-home').value='';
+      document.getElementById('inp-away').value='';
+      document.getElementById('inp-league').value='';
+    } else {
+      alert(data.error||'Hata');
+    }
+  } catch(e){ alert('Baglanti hatasi'); }
+  btn.textContent='+ EKLE';
+}
+
+async function removeMatch(mid){
+  await fetch('/api/matches/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:mid})});
+  matches = matches.filter(m=>m.id!==mid);
+  delete watchedUI[mid];
+  renderMatches();
+}
+
+function renderMatches(){
+  const el = document.getElementById('matches-list');
+  if(!matches.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>Henüz mac eklenmedi<br><span style="font-size:10px;color:#2a2a2a">Yukarıdan 1xbet mac ID\'si girerek ekle</span></div>';
+    return;
+  }
+  el.innerHTML = matches.map(m=>matchCard(m)).join('');
+}
+
+function matchCard(m){
+  const w=watchedUI[m.id]||new Set();
+  const watched=w.size>0;
+  return `<div class="match-card ${watched?'watched':''}" id="card-${m.id}">
+    <div class="match-head" onclick="toggleCard('${m.id}')">
+      <div class="match-names">
+        <div class="match-title">${m.home} <span style="color:#333">–</span> ${m.away}</div>
+        <div class="match-meta">${m.league||''}${m.league&&m.kickoff?' · ':''}${m.kickoff||''} <span style="color:#333">· ID: ${m.id}</span></div>
+      </div>
+      ${watched?`<div class="sel-badge">${w.size} SECİLİ</div>`:''}
+      <button class="btn-remove" onclick="event.stopPropagation();removeMatch('${m.id}')">✕</button>
+      <span class="chevron" id="chev-${m.id}">▼</span>
+    </div>
+    <div class="markets" id="mkt-${m.id}">
+      <div class="markets-label">İZLENECEK BAHİS SEÇENEKLERİ</div>
+      <div class="market-grid">
+        ${MARKETS.map(mk=>{
+          const active=w.has(mk.key);
+          const opened=openedUI[m.id+'_'+mk.key];
+          const cls=opened?'opened':active?'active':'';
+          const sub=opened?'✓ ACILDI':active?'izleniyor':'';
+          return `<div class="mkt ${cls}" onclick="toggleMarket('${m.id}','${mk.key}')">
+            <div class="mkt-icon">${mk.icon}</div>
+            <div class="mkt-label">${mk.label}</div>
+            <div class="mkt-sub">${sub}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(mid){
+  const mkt=document.getElementById('mkt-'+mid);
+  const chev=document.getElementById('chev-'+mid);
+  chev.textContent=mkt.classList.toggle('open')?'▲':'▼';
+}
+
+async function toggleMarket(mid,key){
+  if(!watchedUI[mid]) watchedUI[mid]=new Set();
+  const has=watchedUI[mid].has(key);
+  has?watchedUI[mid].delete(key):watchedUI[mid].add(key);
+  if(!watchedUI[mid].size) delete watchedUI[mid];
+  await fetch('/api/watch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({match_id:mid,market_key:key,active:!has})});
+  const card=document.getElementById('card-'+mid);
+  const match=matches.find(f=>f.id===mid);
+  if(card&&match) card.outerHTML=matchCard(match);
+}
+
+async function toggleMonitor(){
+  const action=monitoring?'stop':'start';
+  await fetch('/api/monitor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});
+  monitoring=!monitoring;
+  const btn=document.getElementById('btn-start');
+  const bar=document.getElementById('status-bar');
+  if(monitoring){btn.textContent='◼ DURDUR';btn.className='live';bar.style.display='flex';startPoll();}
+  else{btn.textContent='▶ BAŞLAT';btn.className='ready';bar.style.display='none';stopPoll();}
+}
+
+function startPoll(){pollTimer=setInterval(pollState,5000);pollState();}
+function stopPoll(){clearInterval(pollTimer);}
+
+async function pollState(){
+  const res=await fetch('/api/state');
+  const data=await res.json();
+  document.getElementById('last-check').textContent=data.last_check||'—';
+  data.log.forEach(entry=>{
+    const key=entry.match+'_'+entry.market;
+    if(!openedUI[key]){openedUI[key]=true;renderMatches();}
+  });
+  renderLog(data.log);
+  if(data.log.length) document.getElementById('tab-log').innerHTML=`Bildirimler <span class="badge">${data.log.length}</span>`;
+}
+
+function renderLog(log){
+  const el=document.getElementById('log-list');
+  if(!log.length) return;
+  el.innerHTML=log.map(e=>`<div class="log-item">
+    <div class="log-icon">${e.icon}</div>
+    <div class="log-info">
+      <div class="log-market">${e.market}<span class="log-sent"> → TELEGRAM'A GÖNDERİLDİ</span></div>
+      <div class="log-match">${e.match}</div>
+    </div>
+    <div class="log-time">${e.time}</div>
+  </div>`).join('');
+}
+
+async function setFreq(s,e){
+  document.querySelectorAll('.freq-btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  await fetch('/api/interval',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seconds:s})});
+}
+
+async function testTelegram(){
+  const btn=document.getElementById('btn-test');
+  const err=document.getElementById('test-err');
+  btn.textContent='⏳ GÖNDERİLİYOR...'; err.style.display='none';
+  try{
+    const res=await fetch('/api/test-telegram',{method:'POST'});
+    const data=await res.json();
+    if(data.ok){btn.textContent="✓ TELEGRAM'A GELDİ!";btn.className='btn-test ok';}
+    else throw new Error(data.error);
+  }catch(e){
+    btn.textContent='✗ HATA';btn.className='btn-test err';
+    err.style.display='block';err.textContent='Hata: '+e.message;
+  }
+  setTimeout(()=>{btn.textContent='📨 TEST MESAJI GÖNDER';btn.className='btn-test';},4000);
+}
+
+async function loadConfig(){
+  const res=await fetch('/api/config');
+  const data=await res.json();
+  document.getElementById('cfg-token').placeholder=data.has_token?`✓ Token tanimli (${data.token_preview})`:"TG_TOKEN tanimlanmamis!";
+  document.getElementById('cfg-chat').value=data.chat_id||'';
+  document.getElementById('btn-start').className=(data.has_token&&data.has_chat)?'ready':'';
+  document.getElementById('tab-config').innerHTML=`Telegram${data.has_token&&data.has_chat?' ✓':''}`;
+  document.getElementById('preview-time').textContent=new Date().toLocaleTimeString('tr-TR');
+}
+
+async function loadMatches(){
+  const res=await fetch('/api/matches');
+  matches=await res.json();
+  renderMatches();
+}
+
+loadConfig();
+loadMatches();
+</script>
+</body>
+</html>
