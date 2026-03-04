@@ -40,19 +40,24 @@ LEAGUES = [
 DOMAINS = [
     "1xlite-51447.pro",
     "1xlite-989182.top",
-    "1xlite-949285.top",
-    "1xlite-628181.top",
-    "1xlite-506423.top",
     "1xbet.com",
     "1xbet.co.ke",
-    "1xbet.ng",
 ]
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "tr-TR,tr;q=0.9,en;q=0.8",
-    "Referer": "https://1xbet.com/",
+    "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "sec-ch-ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Referer": "https://1xlite-51447.pro/",
+    "Origin": "https://1xlite-51447.pro",
 }
 
 def send_telegram(token, chat_id, text):
@@ -96,7 +101,7 @@ def get_working_domain():
         if not domain:
             continue
         try:
-            url = f"https://{domain}/LineFeed/GetSportsShortZip?sports=1&lng=EN&tf=10000&tz=0"
+            url = f"https://{domain}/LineFeed/Get1x2_VZip?sports=1&count=5&lng=EN&tf=10000&tz=0&mode=4"
             r = requests.get(url, headers=HEADERS, timeout=6)
             if r.status_code == 200 and r.json():
                 log.info(f"Aktif domain: {domain}")
