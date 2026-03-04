@@ -6,17 +6,18 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 log = logging.getLogger(__name__)
 app = Flask(__name__)
 
-TG_TOKEN = os.environ.get("TG_TOKEN", "")
-TG_CHAT  = os.environ.get("TG_CHAT",  "")
+TG_TOKEN    = os.environ.get("TG_TOKEN", "")
+TG_CHAT     = os.environ.get("TG_CHAT",  "")
+SCRAPER_KEY = os.environ.get("SCRAPER_KEY", "")
 
 state = {
-    "watched":    {},
-    "notified":   {},
-    "monitoring": False,
-    "last_check": None,
-    "log":        [],
-    "fixtures":   [],
-    "interval":   60,
+    "watched":     {},
+    "notified":    {},
+    "monitoring":  False,
+    "last_check":  None,
+    "log":         [],
+    "fixtures":    [],
+    "interval":    60,
     "last_domain": None,
 }
 
@@ -40,25 +41,24 @@ LEAGUES = [
 DOMAINS = [
     "1xlite-51447.pro",
     "1xlite-989182.top",
+    "1xlite-949285.top",
     "1xbet.com",
     "1xbet.co.ke",
 ]
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive",
-    "sec-ch-ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": '"Windows"',
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
-    "Referer": "https://1xlite-51447.pro/",
-    "Origin": "https://1xlite-51447.pro",
-}
+def proxy_url(target_url):
+    if SCRAPER_KEY:
+        return f"http://api.scraperapi.com?api_key={SCRAPER_KEY}&url={requests.utils.quote(target_url, safe='')}"
+    return target_url
+
+def scraper_get(url, timeout=15):
+    final_url = proxy_url(url)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+    }
+    r = requests.get(final_url, headers=headers, timeout=timeout)
+    return r
 
 def send_telegram(token, chat_id, text):
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -69,31 +69,27 @@ def send_telegram(token, chat_id, text):
     return data
 
 def find_active_domain():
-    """Otomatik aktif 1xlite domain bul"""
     try:
-        r = requests.get("https://1xbet.com/en/", headers=HEADERS, timeout=6, allow_redirects=True)
+        r = scraper_get("https://1xbet.com/en/", timeout=8)
         found = re.findall(r'1xlite-\d+\.[a-z]+', r.text)
         if found:
-            log.info(f"Otomatik domain bulundu: {found[0]}")
+            log.info(f"Otomatik domain: {found[0]}")
             return found[0]
     except Exception as e:
         log.debug(f"Otomatik domain bulunamadi: {e}")
     return None
 
 def get_working_domain():
-    """Calisan domain bul ve cachele"""
-    # Once cache'deki domain'i dene
     if state["last_domain"]:
         try:
-            url = f"https://{state['last_domain']}/LineFeed/GetSportsShortZip?sports=1&lng=EN&tf=10000&tz=0"
-            r = requests.get(url, headers=HEADERS, timeout=5)
-            if r.status_code == 200:
+            url = f"https://{state['last_domain']}/LineFeed/Get1x2_VZip?sports=1&count=5&lng=EN&tf=10000&tz=0&mode=4"
+            r = scraper_get(url, timeout=8)
+            if r.status_code == 200 and r.json():
                 return state["last_domain"]
         except:
             pass
         state["last_domain"] = None
 
-    # Otomatik domain tespit
     auto = find_active_domain()
     domain_list = ([auto] if auto else []) + DOMAINS
 
@@ -102,7 +98,7 @@ def get_working_domain():
             continue
         try:
             url = f"https://{domain}/LineFeed/Get1x2_VZip?sports=1&count=5&lng=EN&tf=10000&tz=0&mode=4"
-            r = requests.get(url, headers=HEADERS, timeout=6)
+            r = scraper_get(url, timeout=10)
             if r.status_code == 200 and r.json():
                 log.info(f"Aktif domain: {domain}")
                 state["last_domain"] = domain
@@ -121,7 +117,7 @@ def fetch_fixtures():
     for league_name, league_id in LEAGUES:
         try:
             url = f"https://{domain}/LineFeed/GetChampEvents?id={league_id}&lng=EN&tf=604800&tz=0&mode=4"
-            r = requests.get(url, headers=HEADERS, timeout=10)
+            r = scraper_get(url, timeout=12)
             if r.status_code != 200:
                 continue
             events = r.json().get("Value", []) or []
@@ -154,7 +150,7 @@ def get_available_markets(match_id, domain=None):
         return []
     try:
         url = f"https://{domain}/LineFeed/GetGameZip?id={match_id}&lng=EN&isSubGames=true&GroupEvents=true&countevents=250"
-        r = requests.get(url, headers=HEADERS, timeout=8)
+        r = scraper_get(url, timeout=10)
         if r.status_code != 200:
             return []
         game = r.json().get("Value", {}) or {}
@@ -239,7 +235,9 @@ def api_state():
 @app.route("/api/watch", methods=["POST"])
 def api_watch():
     d = request.json
-    mid, mkey, active = str(d.get("match_id","")), d.get("market_key",""), d.get("active",True)
+    mid  = str(d.get("match_id", ""))
+    mkey = d.get("market_key", "")
+    active = d.get("active", True)
     if mid not in state["watched"]:
         state["watched"][mid] = set()
     if active:
@@ -268,7 +266,8 @@ def api_interval():
 @app.route("/api/test-telegram", methods=["POST"])
 def api_test_telegram():
     try:
-        send_telegram(TG_TOKEN, TG_CHAT, "✅ <b>1XWATCH test basarili!</b>\n\nBildirimler bu hesaba gelecek. ⚽")
+        send_telegram(TG_TOKEN, TG_CHAT,
+            "✅ <b>1XWATCH test basarili!</b>\n\nBildirimler bu hesaba gelecek. ⚽")
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 400
@@ -276,10 +275,11 @@ def api_test_telegram():
 @app.route("/api/config")
 def api_config():
     return jsonify({
-        "has_token": bool(TG_TOKEN),
-        "has_chat":  bool(TG_CHAT),
+        "has_token":     bool(TG_TOKEN),
+        "has_chat":      bool(TG_CHAT),
+        "has_scraper":   bool(SCRAPER_KEY),
         "token_preview": TG_TOKEN[:8] + "..." if TG_TOKEN else "",
-        "chat_id": TG_CHAT,
+        "chat_id":       TG_CHAT,
     })
 
 if __name__ == "__main__":
