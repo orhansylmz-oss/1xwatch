@@ -282,6 +282,22 @@ def api_config():
         "chat_id":       TG_CHAT,
     })
 
+@app.route("/api/test-domain")
+def api_test_domain():
+    import urllib.parse
+    domain = request.args.get("d", "1xlite-41212.pro")
+    url = f"https://{domain}/LineFeed/Get1x2_VZip?sports=1&count=5&lng=EN&tf=10000&tz=0&mode=4"
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=8)
+        return jsonify({"status": r.status_code, "size": len(r.text), "preview": r.text[:200]})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+```
+
+Commit → deploy → sonra tarayıcıda şu linki aç:
+```
+https://onexwatch.onrender.com/api/test-domain?d=1xlite-41212.pro
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     threading.Thread(target=lambda: state.update({"fixtures": fetch_fixtures()}), daemon=True).start()
