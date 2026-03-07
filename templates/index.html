@@ -3,80 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1XWATCH</title>
+<title>VALUE BET BULUCU</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:#060608;color:#dde;font-family:'IBM Plex Mono',monospace;font-size:13px;min-height:100vh}
   ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#222}
   button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
-  input{outline:none;font:inherit}
   header{position:sticky;top:0;z-index:50;background:rgba(6,6,8,.97);border-bottom:1px solid #1a1a22;backdrop-filter:blur(12px)}
-  .hbar{max-width:800px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:16px}
+  .hbar{max-width:900px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:16px}
   .logo{font-size:18px;font-weight:700;letter-spacing:-1px;flex-shrink:0}
   .logo span{color:#2eff7a}
   .status{flex:1;display:flex;align-items:center;gap:8px}
   .dot{width:7px;height:7px;border-radius:50%;background:#2eff7a;animation:glow 1.5s ease-in-out infinite}
   .status-txt{font-size:10px;color:#2eff7a;letter-spacing:1px}
-  #btn-start{padding:6px 14px;border:1px solid #333;color:#444;font-size:10px;letter-spacing:1.5px;transition:all .2s}
-  #btn-start.ready{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
-  #btn-start.live{border-color:#ff4d4d;color:#ff4d4d;background:rgba(255,77,77,.08)}
-  .tabs{max-width:800px;margin:0 auto;padding:0 16px;display:flex;border-top:1px solid #111}
+  .hbtns{display:flex;gap:8px}
+  #btn-scan{padding:6px 14px;border:1px solid #2eff7a;color:#2eff7a;background:rgba(46,255,122,.08);font-size:10px;letter-spacing:1.5px;transition:all .2s}
+  #btn-scan:disabled{opacity:.4;cursor:default}
+  #btn-monitor{padding:6px 14px;border:1px solid #333;color:#444;font-size:10px;letter-spacing:1.5px;transition:all .2s}
+  #btn-monitor.live{border-color:#ff4d4d;color:#ff4d4d;background:rgba(255,77,77,.08)}
+  .tabs{max-width:900px;margin:0 auto;padding:0 16px;display:flex;border-top:1px solid #111}
   .tab{padding:8px 14px;font-size:10px;letter-spacing:1px;border-bottom:2px solid transparent;color:#555;transition:all .15s}
   .tab.active{border-color:#2eff7a;color:#2eff7a}
   .badge{margin-left:4px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.25);color:#2eff7a;padding:1px 5px;font-size:8px}
-  main{max-width:800px;margin:0 auto;padding:20px 16px}
+  main{max-width:900px;margin:0 auto;padding:20px 16px}
   .page{display:none}.page.active{display:block}
-  .domain-bar{margin-bottom:12px;padding:8px 12px;background:rgba(46,255,122,.04);border:1px solid rgba(46,255,122,.1);display:flex;align-items:center;justify-content:space-between;font-size:9px}
-  .domain-txt{color:#444}
-  .domain-txt span{color:#2eff7a}
-  .btn-refresh{font-size:9px;padding:3px 10px;border:1px solid #222;color:#555;letter-spacing:1px}
-  .match-card{background:#0c0c10;border:1px solid #161620;margin-bottom:8px;transition:border-color .2s}
-  .match-card.watched{border-color:rgba(46,255,122,.2)}
-  .match-head{padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
-  .match-names{flex:1}
-  .match-title{font-size:12px;color:#bbb}
-  .match-card.watched .match-title{color:#fff;font-weight:600}
-  .match-meta{font-size:9px;color:#444;margin-top:3px}
-  .sel-badge{font-size:9px;padding:2px 6px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.25);color:#2eff7a;letter-spacing:1px;flex-shrink:0}
-  .chevron{color:#333;font-size:9px}
-  .markets{padding:0 14px 14px;border-top:1px solid #111;display:none}
-  .markets.open{display:block}
-  .markets-label{font-size:9px;color:#333;letter-spacing:1px;margin:10px 0 8px}
-  .market-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-  .mkt{padding:10px 6px;border:1px solid #1a1a22;color:#3a3a4a;text-align:center;line-height:1.5;transition:all .15s;cursor:pointer}
-  .mkt.active{border-color:rgba(46,255,122,.35);color:rgba(46,255,122,.8);background:rgba(46,255,122,.05)}
-  .mkt.opened{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
-  .mkt-icon{font-size:16px;margin-bottom:3px}
-  .mkt-label{font-size:9px}
-  .mkt-sub{font-size:8px;margin-top:3px;color:rgba(46,255,122,.4)}
-  .mkt.opened .mkt-sub{color:#2eff7a;letter-spacing:1px}
-  .loading{text-align:center;padding:40px;color:#333;font-size:11px}
-  .spinner{display:inline-block;width:18px;height:18px;border:2px solid #222;border-top-color:#2eff7a;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
-  .empty{text-align:center;padding:40px 20px;color:#333;font-size:11px}
-  .empty-icon{font-size:32px;margin-bottom:10px;opacity:.3}
-  .log-item{padding:10px 14px;background:#0c0c10;border:1px solid rgba(46,255,122,.15);display:flex;align-items:center;gap:12px;margin-bottom:6px}
-  .log-icon{font-size:18px}
-  .log-info{flex:1}
-  .log-market{font-size:11px;color:#e0e0ee}
-  .log-sent{color:#2eff7a;font-size:9px;letter-spacing:1px;margin-left:8px}
-  .log-match{font-size:10px;color:#555;margin-top:2px}
-  .log-time{font-size:10px;color:#333;flex-shrink:0}
-  .config-box{padding:20px;background:#0c0c10;border:1px solid #1e1e28;margin-bottom:16px}
-  .config-title{font-size:11px;color:#2eff7a;letter-spacing:2px;margin-bottom:16px}
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:9px;color:#555;letter-spacing:1px;margin-bottom:6px}
-  .field input{width:100%;padding:8px 12px;background:#0a0a0d;border:1px solid #222;color:#e0e0ee;font-size:11px;font-family:inherit}
-  .freq-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-  .freq-btn{padding:6px 12px;font-size:10px;border:1px solid #222;color:#555;transition:all .15s}
-  .freq-btn.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
-  .btn-test{padding:8px 18px;font-size:10px;letter-spacing:1.5px;border:1px solid #333;color:#666;transition:all .2s}
+  /* STATS BAR */
+  .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+  .stat-box{background:#0c0c10;border:1px solid #161620;padding:12px 16px}
+  .stat-label{font-size:8px;color:#444;letter-spacing:1.5px;margin-bottom:6px}
+  .stat-value{font-size:20px;font-weight:700;color:#2eff7a}
+  .stat-sub{font-size:9px;color:#333;margin-top:2px}
+  /* VALUE BET CARD */
+  .vb-card{background:#0c0c10;border:1px solid #161620;margin-bottom:8px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:12px;transition:border-color .2s}
+  .vb-card:hover{border-color:#1e1e28}
+  .vb-card.high{border-left:3px solid #2eff7a}
+  .vb-card.medium{border-left:3px solid #ffc83c}
+  .vb-card.low{border-left:3px solid #555}
+  .vb-match{font-size:13px;color:#fff;font-weight:600;margin-bottom:4px}
+  .vb-meta{font-size:9px;color:#444;margin-bottom:10px}
+  .vb-details{display:flex;gap:16px;flex-wrap:wrap}
+  .vb-detail{display:flex;flex-direction:column;gap:2px}
+  .vb-detail-label{font-size:8px;color:#333;letter-spacing:1px}
+  .vb-detail-value{font-size:12px;color:#bbb}
+  .vb-result{font-size:11px;padding:3px 8px;background:rgba(46,255,122,.08);border:1px solid rgba(46,255,122,.2);color:#2eff7a;margin-bottom:8px;display:inline-block}
+  .vb-value{text-align:right}
+  .vb-pct{font-size:28px;font-weight:700}
+  .vb-pct.high{color:#2eff7a}
+  .vb-pct.medium{color:#ffc83c}
+  .vb-pct.low{color:#666}
+  .vb-pct-label{font-size:8px;color:#333;letter-spacing:1px;text-align:right}
+  .vb-bm{font-size:9px;color:#555;margin-top:8px}
+  /* FILTER BAR */
+  .filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+  .filter-label{font-size:9px;color:#444;letter-spacing:1px}
+  .filter-btn{padding:4px 10px;font-size:9px;border:1px solid #222;color:#555;transition:all .15s}
+  .filter-btn.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  .sort-select{padding:4px 10px;font-size:9px;background:#0c0c10;border:1px solid #222;color:#555;font-family:inherit}
+  /* EMPTY / LOADING */
+  .loading{text-align:center;padding:60px;color:#333;font-size:11px}
+  .spinner{display:inline-block;width:20px;height:20px;border:2px solid #222;border-top-color:#2eff7a;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+  .empty{text-align:center;padding:60px 20px;color:#333;font-size:12px}
+  .empty-icon{font-size:40px;margin-bottom:12px;opacity:.3}
+  /* SETTINGS */
+  .settings-box{background:#0c0c10;border:1px solid #1e1e28;padding:20px;margin-bottom:16px}
+  .settings-title{font-size:11px;color:#2eff7a;letter-spacing:2px;margin-bottom:16px}
+  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #111}
+  .setting-row:last-child{border:none}
+  .setting-label{font-size:11px;color:#bbb}
+  .setting-sub{font-size:9px;color:#444;margin-top:2px}
+  .setting-control{display:flex;gap:6px}
+  .ctrl-btn{padding:5px 12px;font-size:10px;border:1px solid #222;color:#555;transition:all .15s}
+  .ctrl-btn.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  .status-indicator{display:flex;align-items:center;gap:6px;font-size:10px}
+  .si-dot{width:6px;height:6px;border-radius:50%}
+  .si-dot.ok{background:#2eff7a}
+  .si-dot.err{background:#ff4d4d}
+  .btn-test{padding:6px 14px;font-size:10px;border:1px solid #333;color:#666;transition:all .2s}
   .btn-test.ok{border-color:#2eff7a;color:#2eff7a}
   .btn-test.err{border-color:#ff4d4d;color:#ff4d4d}
-  .test-err{margin-top:8px;font-size:10px;color:#ff4d4d}
-  .preview-box{padding:16px;background:#0c0c10;border:1px solid #1e1e28}
-  .preview-label{font-size:9px;color:#444;letter-spacing:1px;margin-bottom:10px}
-  .tg-msg{padding:14px;background:#17212b;border-radius:4px;border-left:3px solid #2eff7a;font-size:12px;line-height:1.8;color:#ccc}
   @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes glow{0%,100%{box-shadow:0 0 6px #2eff7a44}50%{box-shadow:0 0 18px #2eff7a88}}
 </style>
@@ -84,79 +89,124 @@
 <body>
 <header>
   <div class="hbar">
-    <div class="logo">1X<span>WATCH</span></div>
+    <div class="logo">VALUE<span>BET</span></div>
     <div class="status" id="status-bar" style="display:none">
       <div class="dot"></div>
-      <span class="status-txt">CANLI · <span id="last-check">—</span></span>
+      <span class="status-txt">OTOMATİK · <span id="last-check">—</span></span>
     </div>
     <div style="flex:1"></div>
-    <button id="btn-start" onclick="toggleMonitor()">▶ BAŞLAT</button>
+    <div class="hbtns">
+      <button id="btn-scan" onclick="scanNow()">⚡ TARA</button>
+      <button id="btn-monitor" onclick="toggleMonitor()">▶ OTOMATİK</button>
+    </div>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="showPage('fixtures',event)">Fikstür</button>
-    <button class="tab" onclick="showPage('log',event)" id="tab-log">Bildirimler</button>
-    <button class="tab" onclick="showPage('config',event)" id="tab-config">Telegram</button>
+    <button class="tab active" onclick="showPage('bets',event)">Value Betler</button>
+    <button class="tab" onclick="showPage('settings',event)">Ayarlar</button>
   </div>
 </header>
 <main>
-  <div class="page active" id="page-fixtures">
-    <div class="domain-bar">
-      <span class="domain-txt">Domain: <span id="domain-txt">taranıyor...</span></span>
-      <button class="btn-refresh" onclick="refreshFixtures()">↻ YENİLE</button>
+  <!-- VALUE BETLER -->
+  <div class="page active" id="page-bets">
+    <div class="stats-bar">
+      <div class="stat-box">
+        <div class="stat-label">TOPLAM VALUE BET</div>
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-sub">Bu taramada</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">EN YÜKSEK VALUE</div>
+        <div class="stat-value" id="stat-best">—</div>
+        <div class="stat-sub">% value</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">SON TARAMA</div>
+        <div class="stat-value" style="font-size:14px;margin-top:4px" id="stat-time">—</div>
+        <div class="stat-sub">Saat</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">EŞİK</div>
+        <div class="stat-value" id="stat-threshold">%5</div>
+        <div class="stat-sub">Minimum value</div>
+      </div>
     </div>
-    <div id="fixtures-list">
-      <div class="loading"><div class="spinner"></div><br>Maclar yukleniyor...</div>
+    <div class="filter-bar">
+      <span class="filter-label">FİLTRE:</span>
+      <button class="filter-btn active" onclick="setFilter('all',event)">Tümü</button>
+      <button class="filter-btn" onclick="setFilter('high',event)">🟢 Yüksek (%10+)</button>
+      <button class="filter-btn" onclick="setFilter('medium',event)">🟡 Orta (%5-10)</button>
+      <select class="sort-select" onchange="setSort(this.value)">
+        <option value="value">Value'ya göre</option>
+        <option value="kickoff">Maç saatine göre</option>
+      </select>
+    </div>
+    <div id="bets-list">
+      <div class="empty">
+        <div class="empty-icon">🎯</div>
+        Henüz tarama yapılmadı<br>
+        <span style="font-size:10px;color:#2a2a2a">⚡ TARA butonuna bas</span>
+      </div>
     </div>
   </div>
-  <div class="page" id="page-log">
-    <div id="log-list">
-      <div class="empty"><div class="empty-icon">📭</div>Henüz bildirim yok</div>
+  <!-- AYARLAR -->
+  <div class="page" id="page-settings">
+    <div class="settings-box">
+      <div class="settings-title">BAĞLANTI DURUMU</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">The Odds API</div>
+          <div class="setting-sub">Bahis oranları kaynağı</div>
+        </div>
+        <div class="status-indicator" id="si-odds">
+          <div class="si-dot" id="si-odds-dot"></div>
+          <span id="si-odds-txt">kontrol ediliyor...</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Telegram Bot</div>
+          <div class="setting-sub">Bildirim kanalı</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="status-indicator" id="si-tg">
+            <div class="si-dot" id="si-tg-dot"></div>
+            <span id="si-tg-txt">kontrol ediliyor...</span>
+          </div>
+          <button class="btn-test" id="btn-test" onclick="testTelegram()">TEST</button>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="page" id="page-config">
-    <div class="config-box">
-      <div class="config-title">TELEGRAM AYARLARI</div>
-      <div class="field">
-        <label>BOT TOKEN</label>
-        <input id="cfg-token" type="password" placeholder="Railway'de TG_TOKEN tanimli" readonly style="color:#555;cursor:default">
+    <div class="settings-box">
+      <div class="settings-title">TARAMA AYARLARI</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Minimum Value Eşiği</div>
+          <div class="setting-sub">Bu değerin altındaki betler gösterilmez</div>
+        </div>
+        <div class="setting-control">
+          <button class="ctrl-btn" onclick="setMinValue(3)">%3</button>
+          <button class="ctrl-btn active" onclick="setMinValue(5)">%5</button>
+          <button class="ctrl-btn" onclick="setMinValue(10)">%10</button>
+          <button class="ctrl-btn" onclick="setMinValue(15)">%15</button>
+        </div>
       </div>
-      <div class="field">
-        <label>CHAT ID</label>
-        <input id="cfg-chat" type="text" readonly style="color:#555;cursor:default">
-      </div>
-      <div style="font-size:9px;color:#444;letter-spacing:1px;margin-bottom:10px">KONTROL SIKLIĞI</div>
-      <div class="freq-btns">
-        <button class="freq-btn" onclick="setFreq(30,event)">30 sn</button>
-        <button class="freq-btn active" onclick="setFreq(60,event)">1 dk</button>
-        <button class="freq-btn" onclick="setFreq(120,event)">2 dk</button>
-        <button class="freq-btn" onclick="setFreq(300,event)">5 dk</button>
-      </div>
-      <button class="btn-test" id="btn-test" onclick="testTelegram()">📨 TEST MESAJI GÖNDER</button>
-      <div id="test-err" class="test-err" style="display:none"></div>
-    </div>
-    <div class="preview-box">
-      <div class="preview-label">ÖRNEK BİLDİRİM</div>
-      <div class="tg-msg">
-        ⚽ <b>BAHİS SECENEGI ACILDI!</b><br><br>
-        🏟 <b>Wolverhampton vs Liverpool</b><br>
-        🏆 Premier Lig<br>
-        🟨 <b>Faul Sayisi</b> secenegi artik mevcut!<br>
-        ⏰ <span id="preview-time"></span>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Otomatik Tarama Sıklığı</div>
+          <div class="setting-sub">Kaç saatte bir kontrol edilsin</div>
+        </div>
+        <div class="setting-control">
+          <button class="ctrl-btn" onclick="setInterval2(1800)">30dk</button>
+          <button class="ctrl-btn active" onclick="setInterval2(3600)">1 saat</button>
+          <button class="ctrl-btn" onclick="setInterval2(7200)">2 saat</button>
+          <button class="ctrl-btn" onclick="setInterval2(21600)">6 saat</button>
+        </div>
       </div>
     </div>
   </div>
 </main>
 <script>
-const MARKETS=[
-  {key:"fouls",label:"Faul Sayisi",icon:"🟨"},
-  {key:"offsides",label:"Ofsayt",icon:"🚩"},
-  {key:"shots",label:"Sut",icon:"🎯"},
-  {key:"corners",label:"Korner",icon:"📐"},
-  {key:"cards",label:"Kart",icon:"🃏"},
-  {key:"bookings",label:"Ceza Puani",icon:"📋"},
-];
-
-let fixtures=[],watchedUI={},openedUI={},monitoring=false,pollTimer=null;
+let allBets=[], currentFilter='all', currentSort='value', monitoring=false, pollTimer=null;
 
 function showPage(name,e){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -165,172 +215,162 @@ function showPage(name,e){
   if(e)e.target.classList.add('active');
 }
 
-async function loadFixtures(){
-  document.getElementById('fixtures-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Maclar yukleniyor...</div>';
+async function scanNow(){
+  const btn=document.getElementById('btn-scan');
+  btn.textContent='⏳ TARANIYOR...';btn.disabled=true;
+  document.getElementById('bets-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Oranlar çekiliyor...</div>';
   try{
-    const res=await fetch('/api/fixtures');
-    fixtures=await res.json();
-    renderFixtures();
+    await fetch('/api/scan',{method:'POST'});
+    // Sonuçları bekle
+    let tries=0;
+    const wait=setInterval(async()=>{
+      tries++;
+      const res=await fetch('/api/state');
+      const s=await res.json();
+      if(s.last_check||tries>30){
+        clearInterval(wait);
+        await loadBets();
+        btn.textContent='⚡ TARA';btn.disabled=false;
+      }
+    },1000);
   }catch(e){
-    document.getElementById('fixtures-list').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Baglanti hatasi<br><span style="font-size:10px;color:#2a2a2a">Yenile butonuna bas</span></div>';
+    btn.textContent='⚡ TARA';btn.disabled=false;
+    document.getElementById('bets-list').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Hata olustu</div>';
   }
 }
 
-async function refreshFixtures(){
-  document.getElementById('fixtures-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Yenileniyor...</div>';
-  document.getElementById('domain-txt').textContent='taranıyor...';
-  try{
-    const res=await fetch('/api/fixtures/refresh',{method:'POST'});
-    const data=await res.json();
-    if(data.domain) document.getElementById('domain-txt').textContent=data.domain;
-    fixtures=await (await fetch('/api/fixtures')).json();
-    renderFixtures();
-  }catch(e){
-    document.getElementById('fixtures-list').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Hata olustu</div>';
-  }
+async function loadBets(){
+  const res=await fetch('/api/valuebets');
+  allBets=await res.json();
+  renderBets();
+  updateStats();
 }
 
-function renderFixtures(){
-  const el=document.getElementById('fixtures-list');
-  if(!fixtures.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">📅</div>Mac bulunamadi<br><span style="font-size:10px;color:#2a2a2a">Yenile butonuna bas veya domain degismis olabilir</span></div>';
+function renderBets(){
+  const el=document.getElementById('bets-list');
+  let bets=[...allBets];
+
+  // Filtre
+  if(currentFilter==='high') bets=bets.filter(b=>b.value_pct>=10);
+  else if(currentFilter==='medium') bets=bets.filter(b=>b.value_pct>=5&&b.value_pct<10);
+
+  // Sıralama
+  if(currentSort==='value') bets.sort((a,b)=>b.value_pct-a.value_pct);
+  else bets.sort((a,b)=>a.kickoff.localeCompare(b.kickoff));
+
+  if(!bets.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>'+(allBets.length?'Bu filtrede sonuç yok':'Henüz tarama yapılmadı — ⚡ TARA butonuna bas')+'</div>';
     return;
   }
-  el.innerHTML=fixtures.map(m=>matchCard(m)).join('');
-}
 
-function matchCard(m){
-  const w=watchedUI[m.id]||new Set();
-  const watched=w.size>0;
-  return `<div class="match-card ${watched?'watched':''}" id="card-${m.id}">
-    <div class="match-head" onclick="toggleCard('${m.id}')">
-      <div class="match-names">
-        <div class="match-title">${m.home} <span style="color:#333">–</span> ${m.away}</div>
-        <div class="match-meta">${m.league} · ${m.kickoff}</div>
+  el.innerHTML=bets.map(b=>{
+    const cls=b.value_pct>=10?'high':b.value_pct>=5?'medium':'low';
+    return `<div class="vb-card ${cls}">
+      <div>
+        <div class="vb-match">${b.home} <span style="color:#333;font-weight:400">vs</span> ${b.away}</div>
+        <div class="vb-meta">${b.league} · ${b.kickoff}</div>
+        <div class="vb-result">✅ ${b.result}</div>
+        <div class="vb-details">
+          <div class="vb-detail">
+            <span class="vb-detail-label">EN İYİ ORAN</span>
+            <span class="vb-detail-value" style="color:#2eff7a;font-weight:600">${b.best_odds}</span>
+          </div>
+          <div class="vb-detail">
+            <span class="vb-detail-label">ORTALAMA ORAN</span>
+            <span class="vb-detail-value">${b.avg_odds}</span>
+          </div>
+          <div class="vb-detail">
+            <span class="vb-detail-label">BOOKMAKER SAYISI</span>
+            <span class="vb-detail-value">${b.bm_count}</span>
+          </div>
+        </div>
+        <div class="vb-bm">🏦 ${b.bookmakers.join(' · ')}</div>
       </div>
-      ${watched?`<div class="sel-badge">${w.size} SECILI</div>`:''}
-      <span class="chevron" id="chev-${m.id}">▼</span>
-    </div>
-    <div class="markets" id="mkt-${m.id}">
-      <div class="markets-label">IZLENECEK BAHIS SECENEKLERI</div>
-      <div class="market-grid">
-        ${MARKETS.map(mk=>{
-          const active=w.has(mk.key);
-          const opened=openedUI[m.id+'_'+mk.key];
-          const cls=opened?'opened':active?'active':'';
-          const sub=opened?'✓ ACILDI':active?'izleniyor':'';
-          return `<div class="mkt ${cls}" onclick="toggleMarket('${m.id}','${mk.key}')">
-            <div class="mkt-icon">${mk.icon}</div>
-            <div class="mkt-label">${mk.label}</div>
-            <div class="mkt-sub">${sub}</div>
-          </div>`;
-        }).join('')}
+      <div class="vb-value">
+        <div class="vb-pct ${cls}">%${b.value_pct}</div>
+        <div class="vb-pct-label">VALUE</div>
       </div>
-    </div>
-  </div>`;
+    </div>`;
+  }).join('');
 }
 
-function toggleCard(mid){
-  const mkt=document.getElementById('mkt-'+mid);
-  const chev=document.getElementById('chev-'+mid);
-  chev.textContent=mkt.classList.toggle('open')?'▲':'▼';
+function updateStats(){
+  document.getElementById('stat-total').textContent=allBets.length||'0';
+  document.getElementById('stat-best').textContent=allBets.length?('%'+allBets[0].value_pct):'—';
 }
 
-async function toggleMarket(mid,key){
-  if(!watchedUI[mid])watchedUI[mid]=new Set();
-  const has=watchedUI[mid].has(key);
-  has?watchedUI[mid].delete(key):watchedUI[mid].add(key);
-  if(!watchedUI[mid].size)delete watchedUI[mid];
-  await fetch('/api/watch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({match_id:mid,market_key:key,active:!has})});
-  const card=document.getElementById('card-'+mid);
-  const match=fixtures.find(f=>f.id===mid);
-  if(card&&match)card.outerHTML=matchCard(match);
+function setFilter(f,e){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  if(e)e.target.classList.add('active');
+  renderBets();
 }
+
+function setSort(v){currentSort=v;renderBets();}
 
 async function toggleMonitor(){
   const action=monitoring?'stop':'start';
   await fetch('/api/monitor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});
   monitoring=!monitoring;
-  const btn=document.getElementById('btn-start');
+  const btn=document.getElementById('btn-monitor');
   const bar=document.getElementById('status-bar');
   if(monitoring){btn.textContent='◼ DURDUR';btn.className='live';bar.style.display='flex';startPoll();}
-  else{btn.textContent='▶ BAŞLAT';btn.className='ready';bar.style.display='none';stopPoll();}
+  else{btn.textContent='▶ OTOMATİK';btn.className='';bar.style.display='none';stopPoll();}
 }
 
-function startPoll(){pollTimer=setInterval(pollState,5000);pollState();}
+function startPoll(){pollTimer=setInterval(pollState,10000);pollState();}
 function stopPoll(){clearInterval(pollTimer);}
 
 async function pollState(){
-  try{
-    const res=await fetch('/api/state');
-    const data=await res.json();
-    document.getElementById('last-check').textContent=data.last_check||'—';
-    if(data.domain)document.getElementById('domain-txt').textContent=data.domain;
-    data.log.forEach(entry=>{
-      const key=entry.match+'_'+entry.market;
-      if(!openedUI[key]){openedUI[key]=true;renderFixtures();}
-    });
-    renderLog(data.log);
-    if(data.log.length)document.getElementById('tab-log').innerHTML=`Bildirimler <span class="badge">${data.log.length}</span>`;
-  }catch(e){}
+  const res=await fetch('/api/state');
+  const s=await res.json();
+  document.getElementById('last-check').textContent=s.last_check||'—';
+  document.getElementById('stat-time').textContent=s.last_check||'—';
+  document.getElementById('stat-threshold').textContent='%'+s.min_value;
+  if(s.last_check) await loadBets();
 }
 
-function renderLog(log){
-  const el=document.getElementById('log-list');
-  if(!log.length)return;
-  el.innerHTML=log.map(e=>`<div class="log-item">
-    <div class="log-icon">${e.icon}</div>
-    <div class="log-info">
-      <div class="log-market">${e.market}<span class="log-sent"> → TELEGRAM'A GONDERILDI</span></div>
-      <div class="log-match">${e.match}</div>
-    </div>
-    <div class="log-time">${e.time}</div>
-  </div>`).join('');
+async function setMinValue(v){
+  document.querySelectorAll('.ctrl-btn').forEach(b=>{if(b.textContent==='%'+v)b.classList.add('active');else if(['%3','%5','%10','%15'].includes(b.textContent))b.classList.remove('active');});
+  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({min_value:v})});
+  document.getElementById('stat-threshold').textContent='%'+v;
 }
 
-async function setFreq(s,e){
-  document.querySelectorAll('.freq-btn').forEach(b=>b.classList.remove('active'));
-  e.target.classList.add('active');
-  await fetch('/api/interval',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seconds:s})});
+async function setInterval2(s){
+  const labels={1800:'30dk',3600:'1 saat',7200:'2 saat',21600:'6 saat'};
+  document.querySelectorAll('.ctrl-btn').forEach(b=>{if(b.textContent===labels[s])b.classList.add('active');else if(Object.values(labels).includes(b.textContent))b.classList.remove('active');});
+  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({interval:s})});
 }
 
 async function testTelegram(){
   const btn=document.getElementById('btn-test');
-  const err=document.getElementById('test-err');
-  btn.textContent='⏳ GONDERILIYOR...';err.style.display='none';
+  btn.textContent='⏳';
   try{
     const res=await fetch('/api/test-telegram',{method:'POST'});
-    const data=await res.json();
-    if(data.ok){btn.textContent="✓ TELEGRAM'A GELDI!";btn.className='btn-test ok';}
-    else throw new Error(data.error);
-  }catch(e){
-    btn.textContent='✗ HATA';btn.className='btn-test err';
-    err.style.display='block';err.textContent='Hata: '+e.message;
-  }
-  setTimeout(()=>{btn.textContent='📨 TEST MESAJI GÖNDER';btn.className='btn-test';},4000);
+    const d=await res.json();
+    if(d.ok){btn.textContent='✓ GELDI';btn.className='btn-test ok';}
+    else throw new Error(d.error);
+  }catch(e){btn.textContent='✗ HATA';btn.className='btn-test err';}
+  setTimeout(()=>{btn.textContent='TEST';btn.className='btn-test';},3000);
 }
 
 async function loadConfig(){
   const res=await fetch('/api/config');
-  const data=await res.json();
-  document.getElementById('cfg-token').placeholder=data.has_token?`✓ Token tanimli (${data.token_preview})`:"TG_TOKEN tanimlanmamis!";
-  document.getElementById('cfg-chat').value=data.chat_id||'';
-  document.getElementById('btn-start').className=(data.has_token&&data.has_chat)?'ready':'';
-  document.getElementById('tab-config').innerHTML=`Telegram${data.has_token&&data.has_chat?' ✓':''}`;
-  document.getElementById('preview-time').textContent=new Date().toLocaleTimeString('tr-TR');
-}
-
-async function loadState(){
-  try{
-    const res=await fetch('/api/state');
-    const data=await res.json();
-    if(data.domain)document.getElementById('domain-txt').textContent=data.domain;
-  }catch(e){}
+  const d=await res.json();
+  // Odds API
+  const oddsDot=document.getElementById('si-odds-dot');
+  const oddsTxt=document.getElementById('si-odds-txt');
+  if(d.has_odds){oddsDot.className='si-dot ok';oddsTxt.textContent='Bağlı';}
+  else{oddsDot.className='si-dot err';oddsTxt.textContent='API key eksik';}
+  // Telegram
+  const tgDot=document.getElementById('si-tg-dot');
+  const tgTxt=document.getElementById('si-tg-txt');
+  if(d.has_token&&d.has_chat){tgDot.className='si-dot ok';tgTxt.textContent='Bağlı';}
+  else{tgDot.className='si-dot err';tgTxt.textContent='Ayarlanmamış';}
 }
 
 loadConfig();
-loadState();
-loadFixtures();
+loadBets();
 </script>
 </body>
 </html>
