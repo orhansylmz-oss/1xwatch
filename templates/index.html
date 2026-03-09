@@ -11,282 +11,315 @@
   ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#222}
   button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
   header{position:sticky;top:0;z-index:50;background:rgba(6,6,8,.97);border-bottom:1px solid #1a1a22;backdrop-filter:blur(12px)}
-  .hbar{max-width:900px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:16px}
-  .logo{font-size:18px;font-weight:700;letter-spacing:-1px;flex-shrink:0}
+  .hbar{max-width:960px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:12px}
+  .logo{font-size:17px;font-weight:700;letter-spacing:-1px;flex-shrink:0}
   .logo span{color:#2eff7a}
-  .status{flex:1;display:flex;align-items:center;gap:8px}
-  .dot{width:7px;height:7px;border-radius:50%;background:#2eff7a;animation:glow 1.5s ease-in-out infinite}
+  .status-bar{flex:1;display:flex;align-items:center;gap:8px}
+  .dot{width:7px;height:7px;border-radius:50%;background:#2eff7a;animation:glow 1.5s ease-in-out infinite;flex-shrink:0}
   .status-txt{font-size:10px;color:#2eff7a;letter-spacing:1px}
-  .hbtns{display:flex;gap:8px}
-  #btn-scan{padding:6px 14px;border:1px solid #2eff7a;color:#2eff7a;background:rgba(46,255,122,.08);font-size:10px;letter-spacing:1.5px;transition:all .2s}
-  #btn-scan:disabled{opacity:.4;cursor:default}
-  #btn-monitor{padding:6px 14px;border:1px solid #333;color:#444;font-size:10px;letter-spacing:1.5px;transition:all .2s}
-  #btn-monitor.live{border-color:#ff4d4d;color:#ff4d4d;background:rgba(255,77,77,.08)}
-  .tabs{max-width:900px;margin:0 auto;padding:0 16px;display:flex;border-top:1px solid #111}
+  .hbtns{display:flex;gap:6px}
+  .hbtn{padding:6px 14px;font-size:10px;letter-spacing:1.5px;transition:all .2s;border:1px solid #333;color:#666}
+  .hbtn.green{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  .hbtn.red{border-color:#ff4d4d;color:#ff4d4d;background:rgba(255,77,77,.08)}
+  .hbtn:disabled{opacity:.4;cursor:default}
+  .tabs{max-width:960px;margin:0 auto;padding:0 16px;display:flex;border-top:1px solid #111}
   .tab{padding:8px 14px;font-size:10px;letter-spacing:1px;border-bottom:2px solid transparent;color:#555;transition:all .15s}
   .tab.active{border-color:#2eff7a;color:#2eff7a}
-  .badge{margin-left:4px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.25);color:#2eff7a;padding:1px 5px;font-size:8px}
-  main{max-width:900px;margin:0 auto;padding:20px 16px}
+  .badge{margin-left:5px;background:rgba(46,255,122,.1);border:1px solid rgba(46,255,122,.2);color:#2eff7a;padding:1px 5px;font-size:8px;border-radius:2px}
+  .badge.sure{background:rgba(255,196,0,.1);border-color:rgba(255,196,0,.2);color:#ffc400}
+  main{max-width:960px;margin:0 auto;padding:16px}
   .page{display:none}.page.active{display:block}
-  /* STATS BAR */
-  .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
-  .stat-box{background:#0c0c10;border:1px solid #161620;padding:12px 16px}
-  .stat-label{font-size:8px;color:#444;letter-spacing:1.5px;margin-bottom:6px}
-  .stat-value{font-size:20px;font-weight:700;color:#2eff7a}
-  .stat-sub{font-size:9px;color:#333;margin-top:2px}
+
+  /* STATS */
+  .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+  .stat-box{background:#0c0c10;border:1px solid #161620;padding:12px 14px}
+  .stat-label{font-size:8px;color:#444;letter-spacing:1.5px;margin-bottom:5px}
+  .stat-value{font-size:22px;font-weight:700;color:#2eff7a}
+  .stat-value.gold{color:#ffc400}
+  .stat-sub{font-size:9px;color:#2a2a2a;margin-top:2px}
+
+  /* BOOKMAKER FILTER */
+  .bm-panel{background:#0c0c10;border:1px solid #161620;padding:12px 16px;margin-bottom:12px}
+  .bm-title{font-size:9px;color:#444;letter-spacing:2px;margin-bottom:10px}
+  .bm-list{display:flex;flex-wrap:wrap;gap:6px}
+  .bm-chip{padding:4px 10px;font-size:9px;border:1px solid #1e1e28;color:#444;transition:all .15s;cursor:pointer}
+  .bm-chip.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  .bm-chip:hover{border-color:#333;color:#666}
+
+  /* FILTER BAR */
+  .filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+  .filter-label{font-size:9px;color:#333;letter-spacing:1px}
+  .filter-btn{padding:4px 10px;font-size:9px;border:1px solid #1e1e28;color:#444;transition:all .15s}
+  .filter-btn.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
+  .sort-select{padding:4px 10px;font-size:9px;background:#0c0c10;border:1px solid #1e1e28;color:#444;font-family:inherit}
+
   /* VALUE BET CARD */
-  .vb-card{background:#0c0c10;border:1px solid #161620;margin-bottom:8px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:12px;transition:border-color .2s}
+  .vb-card{background:#0c0c10;border:1px solid #161620;margin-bottom:6px;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:12px;transition:border-color .2s;position:relative}
   .vb-card:hover{border-color:#1e1e28}
   .vb-card.high{border-left:3px solid #2eff7a}
   .vb-card.medium{border-left:3px solid #ffc83c}
-  .vb-card.low{border-left:3px solid #555}
-  .vb-match{font-size:13px;color:#fff;font-weight:600;margin-bottom:4px}
-  .vb-meta{font-size:9px;color:#444;margin-bottom:10px}
+  .vb-card.low{border-left:3px solid #333}
+  .vb-match{font-size:13px;color:#eee;font-weight:600;margin-bottom:3px}
+  .vb-meta{font-size:9px;color:#333;margin-bottom:8px}
+  .vb-tag{font-size:10px;padding:2px 8px;display:inline-block;margin-bottom:8px}
+  .vb-tag.value{background:rgba(46,255,122,.08);border:1px solid rgba(46,255,122,.2);color:#2eff7a}
   .vb-details{display:flex;gap:16px;flex-wrap:wrap}
-  .vb-detail{display:flex;flex-direction:column;gap:2px}
-  .vb-detail-label{font-size:8px;color:#333;letter-spacing:1px}
-  .vb-detail-value{font-size:12px;color:#bbb}
-  .vb-result{font-size:11px;padding:3px 8px;background:rgba(46,255,122,.08);border:1px solid rgba(46,255,122,.2);color:#2eff7a;margin-bottom:8px;display:inline-block}
-  .vb-value{text-align:right}
-  .vb-pct{font-size:28px;font-weight:700}
+  .vb-dl{font-size:8px;color:#333;letter-spacing:1px;margin-bottom:2px}
+  .vb-dv{font-size:12px;color:#aaa}
+  .vb-dv.best{color:#2eff7a;font-weight:600}
+  .vb-num{text-align:right}
+  .vb-pct{font-size:26px;font-weight:700}
   .vb-pct.high{color:#2eff7a}
   .vb-pct.medium{color:#ffc83c}
-  .vb-pct.low{color:#666}
+  .vb-pct.low{color:#555}
   .vb-pct-label{font-size:8px;color:#333;letter-spacing:1px;text-align:right}
-  .vb-bm{font-size:9px;color:#555;margin-top:8px}
-  /* FILTER BAR */
-  .filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-  .filter-label{font-size:9px;color:#444;letter-spacing:1px}
-  .filter-btn{padding:4px 10px;font-size:9px;border:1px solid #222;color:#555;transition:all .15s}
-  .filter-btn.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
-  .sort-select{padding:4px 10px;font-size:9px;background:#0c0c10;border:1px solid #222;color:#555;font-family:inherit}
+  .odds-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .odds-chip{padding:3px 8px;font-size:9px;border:1px solid #1a1a22;color:#555}
+  .odds-chip.best-chip{border-color:rgba(46,255,122,.3);color:#2eff7a}
+
+  /* SURE BET CARD */
+  .sb-card{background:#0c0c10;border:1px solid #1e1520;border-left:3px solid #ffc400;margin-bottom:6px;padding:14px 16px}
+  .sb-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+  .sb-match{font-size:13px;color:#eee;font-weight:600}
+  .sb-meta{font-size:9px;color:#333;margin-top:3px}
+  .sb-profit{text-align:right}
+  .sb-pct{font-size:26px;font-weight:700;color:#ffc400}
+  .sb-pct-label{font-size:8px;color:#554400;letter-spacing:1px}
+  .sb-rows{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:2px}
+  .sb-row{background:#0a0a0e;border:1px solid #1a1a22;padding:10px 12px}
+  .sb-row-label{font-size:8px;color:#444;letter-spacing:1px;margin-bottom:6px}
+  .sb-row-result{font-size:11px;color:#ddd;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sb-row-odds{font-size:18px;font-weight:700;color:#ffc400;margin-bottom:2px}
+  .sb-row-bm{font-size:9px;color:#555;margin-bottom:4px}
+  .sb-row-stake{font-size:10px;color:#2eff7a}
+
   /* EMPTY / LOADING */
-  .loading{text-align:center;padding:60px;color:#333;font-size:11px}
-  .spinner{display:inline-block;width:20px;height:20px;border:2px solid #222;border-top-color:#2eff7a;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
-  .empty{text-align:center;padding:60px 20px;color:#333;font-size:12px}
-  .empty-icon{font-size:40px;margin-bottom:12px;opacity:.3}
+  .loading{text-align:center;padding:50px;color:#333;font-size:11px}
+  .spinner{display:inline-block;width:18px;height:18px;border:2px solid #1a1a22;border-top-color:#2eff7a;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+  .empty{text-align:center;padding:50px 20px;color:#2a2a2a;font-size:12px}
+  .empty-icon{font-size:36px;margin-bottom:10px;opacity:.4}
+
   /* SETTINGS */
-  .settings-box{background:#0c0c10;border:1px solid #1e1e28;padding:20px;margin-bottom:16px}
-  .settings-title{font-size:11px;color:#2eff7a;letter-spacing:2px;margin-bottom:16px}
-  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #111}
-  .setting-row:last-child{border:none}
-  .setting-label{font-size:11px;color:#bbb}
-  .setting-sub{font-size:9px;color:#444;margin-top:2px}
-  .setting-control{display:flex;gap:6px}
-  .ctrl-btn{padding:5px 12px;font-size:10px;border:1px solid #222;color:#555;transition:all .15s}
+  .s-box{background:#0c0c10;border:1px solid #1e1e28;padding:16px;margin-bottom:12px}
+  .s-title{font-size:9px;color:#2eff7a;letter-spacing:2px;margin-bottom:14px}
+  .s-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #0f0f14}
+  .s-row:last-child{border:none}
+  .s-label{font-size:11px;color:#aaa}
+  .s-sub{font-size:9px;color:#333;margin-top:2px}
+  .s-ctrl{display:flex;gap:5px}
+  .ctrl-btn{padding:4px 11px;font-size:9px;border:1px solid #1e1e28;color:#444;transition:all .15s}
   .ctrl-btn.active{border-color:#2eff7a;color:#2eff7a;background:rgba(46,255,122,.08)}
-  .status-indicator{display:flex;align-items:center;gap:6px;font-size:10px}
-  .si-dot{width:6px;height:6px;border-radius:50%}
-  .si-dot.ok{background:#2eff7a}
-  .si-dot.err{background:#ff4d4d}
-  .btn-test{padding:6px 14px;font-size:10px;border:1px solid #333;color:#666;transition:all .2s}
+  .si-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .si-dot.ok{background:#2eff7a}.si-dot.err{background:#ff4d4d}
+  .btn-test{padding:5px 12px;font-size:9px;border:1px solid #1e1e28;color:#444;transition:all .2s}
   .btn-test.ok{border-color:#2eff7a;color:#2eff7a}
   .btn-test.err{border-color:#ff4d4d;color:#ff4d4d}
+
   @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes glow{0%,100%{box-shadow:0 0 6px #2eff7a44}50%{box-shadow:0 0 18px #2eff7a88}}
+  @keyframes glow{0%,100%{box-shadow:0 0 6px #2eff7a44}50%{box-shadow:0 0 16px #2eff7a88}}
 </style>
 </head>
 <body>
 <header>
   <div class="hbar">
     <div class="logo">VALUE<span>BET</span></div>
-    <div class="status" id="status-bar" style="display:none">
+    <div class="status-bar" id="status-bar" style="display:none">
       <div class="dot"></div>
-      <span class="status-txt">OTOMATİK · <span id="last-check">—</span></span>
+      <span class="status-txt">OTOMATİK · <span id="last-check-hdr">—</span></span>
     </div>
     <div style="flex:1"></div>
     <div class="hbtns">
-      <button id="btn-scan" onclick="scanNow()">⚡ TARA</button>
-      <button id="btn-monitor" onclick="toggleMonitor()">▶ OTOMATİK</button>
+      <button class="hbtn green" id="btn-scan" onclick="scanNow()">⚡ TARA</button>
+      <button class="hbtn" id="btn-monitor" onclick="toggleMonitor()">▶ OTOMATİK</button>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="showPage('bets',event)">Value Betler</button>
-    <button class="tab" onclick="showPage('settings',event)">Ayarlar</button>
+    <button class="tab active" onclick="showPage('value',this)">Value Bet <span class="badge" id="badge-value">0</span></button>
+    <button class="tab" onclick="showPage('sure',this)">Sure Bet <span class="badge sure" id="badge-sure">0</span></button>
+    <button class="tab" onclick="showPage('settings',this)">Ayarlar</button>
   </div>
 </header>
 <main>
-  <!-- VALUE BETLER -->
-  <div class="page active" id="page-bets">
+  <!-- VALUE BET -->
+  <div class="page active" id="page-value">
     <div class="stats-bar">
-      <div class="stat-box">
-        <div class="stat-label">TOPLAM VALUE BET</div>
-        <div class="stat-value" id="stat-total">—</div>
-        <div class="stat-sub">Bu taramada</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">EN YÜKSEK VALUE</div>
-        <div class="stat-value" id="stat-best">—</div>
-        <div class="stat-sub">% value</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">SON TARAMA</div>
-        <div class="stat-value" style="font-size:14px;margin-top:4px" id="stat-time">—</div>
-        <div class="stat-sub">Saat</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">EŞİK</div>
-        <div class="stat-value" id="stat-threshold">%5</div>
-        <div class="stat-sub">Minimum value</div>
-      </div>
+      <div class="stat-box"><div class="stat-label">VALUE BET</div><div class="stat-value" id="sv-total">0</div><div class="stat-sub">Bu taramada</div></div>
+      <div class="stat-box"><div class="stat-label">EN YÜKSEK</div><div class="stat-value" id="sv-best">—</div><div class="stat-sub">% value</div></div>
+      <div class="stat-box"><div class="stat-label">SON TARAMA</div><div class="stat-value" style="font-size:14px;margin-top:4px" id="sv-time">—</div><div class="stat-sub">Saat</div></div>
+      <div class="stat-box"><div class="stat-label">EŞİK</div><div class="stat-value" id="sv-threshold">%5</div><div class="stat-sub">Minimum value</div></div>
+    </div>
+    <div class="bm-panel">
+      <div class="bm-title">BOOKMAKER FİLTRESİ — seçili siteler karşılaştırılır</div>
+      <div class="bm-list" id="bm-chips"></div>
     </div>
     <div class="filter-bar">
       <span class="filter-label">FİLTRE:</span>
-      <button class="filter-btn active" onclick="setFilter('all',event)">Tümü</button>
-      <button class="filter-btn" onclick="setFilter('high',event)">🟢 Yüksek (%10+)</button>
-      <button class="filter-btn" onclick="setFilter('medium',event)">🟡 Orta (%5-10)</button>
-      <select class="sort-select" onchange="setSort(this.value)">
+      <button class="filter-btn active" onclick="setVFilter('all',this)">Tümü</button>
+      <button class="filter-btn" onclick="setVFilter('high',this)">🟢 %10+</button>
+      <button class="filter-btn" onclick="setVFilter('medium',this)">🟡 %5-10</button>
+      <select class="sort-select" onchange="vSort=this.value;renderValue()">
         <option value="value">Value'ya göre</option>
         <option value="kickoff">Maç saatine göre</option>
       </select>
     </div>
-    <div id="bets-list">
-      <div class="empty">
-        <div class="empty-icon">🎯</div>
-        Henüz tarama yapılmadı<br>
-        <span style="font-size:10px;color:#2a2a2a">⚡ TARA butonuna bas</span>
-      </div>
-    </div>
+    <div id="value-list"><div class="empty"><div class="empty-icon">🎯</div>⚡ TARA butonuna bas</div></div>
   </div>
+
+  <!-- SURE BET -->
+  <div class="page" id="page-sure">
+    <div class="stats-bar">
+      <div class="stat-box"><div class="stat-label">SURE BET</div><div class="stat-value gold" id="ss-total">0</div><div class="stat-sub">Garantili kâr</div></div>
+      <div class="stat-box"><div class="stat-label">EN YÜKSEK KÂR</div><div class="stat-value gold" id="ss-best">—</div><div class="stat-sub">% kâr</div></div>
+      <div class="stat-box"><div class="stat-label">SON TARAMA</div><div class="stat-value" style="font-size:14px;margin-top:4px" id="ss-time">—</div><div class="stat-sub">Saat</div></div>
+      <div class="stat-box"><div class="stat-label">MİN KÂR</div><div class="stat-value gold" id="ss-threshold">%1</div><div class="stat-sub">Minimum kâr</div></div>
+    </div>
+    <div id="sure-list"><div class="empty"><div class="empty-icon">🔒</div>⚡ TARA butonuna bas</div></div>
+  </div>
+
   <!-- AYARLAR -->
   <div class="page" id="page-settings">
-    <div class="settings-box">
-      <div class="settings-title">BAĞLANTI DURUMU</div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">The Odds API</div>
-          <div class="setting-sub">Bahis oranları kaynağı</div>
-        </div>
-        <div class="status-indicator" id="si-odds">
-          <div class="si-dot" id="si-odds-dot"></div>
-          <span id="si-odds-txt">kontrol ediliyor...</span>
-        </div>
+    <div class="s-box">
+      <div class="s-title">BAĞLANTI DURUMU</div>
+      <div class="s-row">
+        <div><div class="s-label">The Odds API</div><div class="s-sub">Bahis oranları</div></div>
+        <div style="display:flex;align-items:center;gap:6px"><div class="si-dot" id="si-odds-dot"></div><span id="si-odds-txt" style="font-size:10px;color:#555">...</span></div>
       </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Telegram Bot</div>
-          <div class="setting-sub">Bildirim kanalı</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="status-indicator" id="si-tg">
-            <div class="si-dot" id="si-tg-dot"></div>
-            <span id="si-tg-txt">kontrol ediliyor...</span>
-          </div>
-          <button class="btn-test" id="btn-test" onclick="testTelegram()">TEST</button>
+      <div class="s-row">
+        <div><div class="s-label">Telegram Bot</div><div class="s-sub">Bildirim kanalı</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;align-items:center;gap:6px"><div class="si-dot" id="si-tg-dot"></div><span id="si-tg-txt" style="font-size:10px;color:#555">...</span></div>
+          <button class="btn-test" id="btn-test" onclick="testTg()">TEST</button>
         </div>
       </div>
     </div>
-    <div class="settings-box">
-      <div class="settings-title">TARAMA AYARLARI</div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Minimum Value Eşiği</div>
-          <div class="setting-sub">Bu değerin altındaki betler gösterilmez</div>
-        </div>
-        <div class="setting-control">
-          <button class="ctrl-btn" onclick="setMinValue(3)">%3</button>
-          <button class="ctrl-btn active" onclick="setMinValue(5)">%5</button>
-          <button class="ctrl-btn" onclick="setMinValue(10)">%10</button>
-          <button class="ctrl-btn" onclick="setMinValue(15)">%15</button>
+    <div class="s-box">
+      <div class="s-title">VALUE BET AYARLARI</div>
+      <div class="s-row">
+        <div><div class="s-label">Minimum Value Eşiği</div><div class="s-sub">Altındaki betler gösterilmez</div></div>
+        <div class="s-ctrl">
+          <button class="ctrl-btn" onclick="setMinValue(3,this)">%3</button>
+          <button class="ctrl-btn active" onclick="setMinValue(5,this)">%5</button>
+          <button class="ctrl-btn" onclick="setMinValue(10,this)">%10</button>
+          <button class="ctrl-btn" onclick="setMinValue(15,this)">%15</button>
         </div>
       </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Otomatik Tarama Sıklığı</div>
-          <div class="setting-sub">Kaç saatte bir kontrol edilsin</div>
+    </div>
+    <div class="s-box">
+      <div class="s-title">SURE BET AYARLARI</div>
+      <div class="s-row">
+        <div><div class="s-label">Minimum Kâr Eşiği</div><div class="s-sub">Altındaki sure betler gösterilmez</div></div>
+        <div class="s-ctrl">
+          <button class="ctrl-btn" onclick="setMinProfit(0.5,this)">%0.5</button>
+          <button class="ctrl-btn active" onclick="setMinProfit(1,this)">%1</button>
+          <button class="ctrl-btn" onclick="setMinProfit(2,this)">%2</button>
+          <button class="ctrl-btn" onclick="setMinProfit(3,this)">%3</button>
         </div>
-        <div class="setting-control">
-          <button class="ctrl-btn" onclick="setInterval2(1800)">30dk</button>
-          <button class="ctrl-btn active" onclick="setInterval2(3600)">1 saat</button>
-          <button class="ctrl-btn" onclick="setInterval2(7200)">2 saat</button>
-          <button class="ctrl-btn" onclick="setInterval2(21600)">6 saat</button>
+      </div>
+    </div>
+    <div class="s-box">
+      <div class="s-title">OTOMATİK TARAMA</div>
+      <div class="s-row">
+        <div><div class="s-label">Tarama Sıklığı</div><div class="s-sub">Kaç dakikada/saatte bir</div></div>
+        <div class="s-ctrl">
+          <button class="ctrl-btn" onclick="setInterval2(1800,this)">30dk</button>
+          <button class="ctrl-btn active" onclick="setInterval2(3600,this)">1sa</button>
+          <button class="ctrl-btn" onclick="setInterval2(7200,this)">2sa</button>
+          <button class="ctrl-btn" onclick="setInterval2(21600,this)">6sa</button>
         </div>
       </div>
     </div>
   </div>
 </main>
 <script>
-let allBets=[], currentFilter='all', currentSort='value', monitoring=false, pollTimer=null;
+let valueBets=[], sureBets=[], vFilter='all', vSort='value', monitoring=false, pollTimer=null;
+let selectedBMs=new Set();
 
-function showPage(name,e){
+function showPage(name,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  if(e)e.target.classList.add('active');
+  if(el)el.classList.add('active');
 }
 
+// BOOKMAKER CHIPS
+async function loadBookmakers(){
+  const res=await fetch('/api/bookmakers');
+  const d=await res.json();
+  selectedBMs=new Set(d.selected);
+  const el=document.getElementById('bm-chips');
+  el.innerHTML=d.all.map(bm=>`
+    <div class="bm-chip ${selectedBMs.has(bm)?'active':''}" onclick="toggleBM('${bm}',this)">${bm}</div>
+  `).join('');
+}
+
+async function toggleBM(bm,el){
+  if(selectedBMs.has(bm)) selectedBMs.delete(bm);
+  else selectedBMs.add(bm);
+  el.classList.toggle('active');
+  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({selected_books:[...selectedBMs]})});
+}
+
+// SCAN
 async function scanNow(){
   const btn=document.getElementById('btn-scan');
-  btn.textContent='⏳ TARANIYOR...';btn.disabled=true;
-  document.getElementById('bets-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Oranlar çekiliyor...</div>';
-  try{
-    await fetch('/api/scan',{method:'POST'});
-    // Sonuçları bekle
-    let tries=0;
-    const wait=setInterval(async()=>{
-      tries++;
-      const res=await fetch('/api/state');
-      const s=await res.json();
-      if(s.last_check||tries>30){
-        clearInterval(wait);
-        await loadBets();
-        btn.textContent='⚡ TARA';btn.disabled=false;
-      }
-    },1000);
-  }catch(e){
-    btn.textContent='⚡ TARA';btn.disabled=false;
-    document.getElementById('bets-list').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>Hata olustu</div>';
-  }
+  btn.textContent='⏳';btn.disabled=true;
+  document.getElementById('value-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Taranıyor...</div>';
+  document.getElementById('sure-list').innerHTML='<div class="loading"><div class="spinner"></div><br>Taranıyor...</div>';
+  await fetch('/api/scan',{method:'POST'});
+  let tries=0;
+  const prev=document.getElementById('sv-time').textContent;
+  const wait=setInterval(async()=>{
+    tries++;
+    const s=await(await fetch('/api/state')).json();
+    if((s.last_check&&s.last_check!==prev)||tries>40){
+      clearInterval(wait);
+      await loadAll();
+      btn.textContent='⚡ TARA';btn.disabled=false;
+    }
+  },1000);
 }
 
-async function loadBets(){
-  const res=await fetch('/api/valuebets');
-  allBets=await res.json();
-  renderBets();
-  updateStats();
+async function loadAll(){
+  const [vRes,sRes,stRes]=await Promise.all([
+    fetch('/api/valuebets'),fetch('/api/surebets'),fetch('/api/state')
+  ]);
+  valueBets=await vRes.json();
+  sureBets=await sRes.json();
+  const st=await stRes.json();
+  renderValue();renderSure();updateStats(st);
 }
 
-function renderBets(){
-  const el=document.getElementById('bets-list');
-  let bets=[...allBets];
-
-  // Filtre
-  if(currentFilter==='high') bets=bets.filter(b=>b.value_pct>=10);
-  else if(currentFilter==='medium') bets=bets.filter(b=>b.value_pct>=5&&b.value_pct<10);
-
-  // Sıralama
-  if(currentSort==='value') bets.sort((a,b)=>b.value_pct-a.value_pct);
-  else bets.sort((a,b)=>a.kickoff.localeCompare(b.kickoff));
+// VALUE BET RENDER
+function renderValue(){
+  const el=document.getElementById('value-list');
+  let bets=[...valueBets];
+  if(vFilter==='high') bets=bets.filter(b=>b.value_pct>=10);
+  else if(vFilter==='medium') bets=bets.filter(b=>b.value_pct>=5&&b.value_pct<10);
+  if(vSort==='kickoff') bets.sort((a,b)=>a.kickoff.localeCompare(b.kickoff));
 
   if(!bets.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>'+(allBets.length?'Bu filtrede sonuç yok':'Henüz tarama yapılmadı — ⚡ TARA butonuna bas')+'</div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>'+(valueBets.length?'Bu filtrede sonuç yok':'Henüz tarama yapılmadı — ⚡ TARA butonuna bas')+'</div>';
     return;
   }
-
   el.innerHTML=bets.map(b=>{
     const cls=b.value_pct>=10?'high':b.value_pct>=5?'medium':'low';
+    const oddsHtml=(b.all_odds||[]).map(o=>`
+      <div class="odds-chip ${o.bm===b.best_bm?'best-chip':''}">${o.bm}: ${o.odds}</div>
+    `).join('');
     return `<div class="vb-card ${cls}">
       <div>
-        <div class="vb-match">${b.home} <span style="color:#333;font-weight:400">vs</span> ${b.away}</div>
+        <div class="vb-match">${b.home} <span style="color:#2a2a2a">vs</span> ${b.away}</div>
         <div class="vb-meta">${b.league} · ${b.kickoff}</div>
-        <div class="vb-result">✅ ${b.result}</div>
+        <div class="vb-tag value">✅ ${b.result}</div>
         <div class="vb-details">
-          <div class="vb-detail">
-            <span class="vb-detail-label">EN İYİ ORAN</span>
-            <span class="vb-detail-value" style="color:#2eff7a;font-weight:600">${b.best_odds}</span>
-          </div>
-          <div class="vb-detail">
-            <span class="vb-detail-label">ORTALAMA ORAN</span>
-            <span class="vb-detail-value">${b.avg_odds}</span>
-          </div>
-          <div class="vb-detail">
-            <span class="vb-detail-label">BOOKMAKER SAYISI</span>
-            <span class="vb-detail-value">${b.bm_count}</span>
-          </div>
+          <div><div class="vb-dl">EN İYİ ORAN</div><div class="vb-dv best">${b.best_odds} @ ${b.best_bm}</div></div>
+          <div><div class="vb-dl">ORTALAMA</div><div class="vb-dv">${b.avg_odds}</div></div>
+          <div><div class="vb-dl">BOOKMAKER</div><div class="vb-dv">${b.bm_count} site</div></div>
         </div>
-        <div class="vb-bm">🏦 ${b.bookmakers.join(' · ')}</div>
+        <div class="odds-row">${oddsHtml}</div>
       </div>
-      <div class="vb-value">
+      <div class="vb-num">
         <div class="vb-pct ${cls}">%${b.value_pct}</div>
         <div class="vb-pct-label">VALUE</div>
       </div>
@@ -294,19 +327,93 @@ function renderBets(){
   }).join('');
 }
 
-function updateStats(){
-  document.getElementById('stat-total').textContent=allBets.length||'0';
-  document.getElementById('stat-best').textContent=allBets.length?('%'+allBets[0].value_pct):'—';
+// SURE BET RENDER
+function renderSure(){
+  const el=document.getElementById('sure-list');
+  if(!sureBets.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🔒</div>'+(sureBets.length===0&&document.getElementById('ss-time').textContent==='—'?'⚡ TARA butonuna bas':'Sure bet bulunamadı — daha fazla bookmaker seç veya eşiği düşür')+'</div>';
+    return;
+  }
+  el.innerHTML=sureBets.map(sb=>`
+    <div class="sb-card">
+      <div class="sb-header">
+        <div>
+          <div class="sb-match">${sb.home} vs ${sb.away}</div>
+          <div class="sb-meta">${sb.league} · ${sb.kickoff}</div>
+        </div>
+        <div class="sb-profit">
+          <div class="sb-pct">%${sb.profit_pct}</div>
+          <div class="sb-pct-label">GARANTİLİ KÂR</div>
+        </div>
+      </div>
+      <div class="sb-rows">
+        <div class="sb-row">
+          <div class="sb-row-label">1 — EV SAHİBİ</div>
+          <div class="sb-row-result">${sb.home}</div>
+          <div class="sb-row-odds">${sb.home_odds}</div>
+          <div class="sb-row-bm">${sb.home_bm}</div>
+          <div class="sb-row-stake">→ ${sb.home_stake} birim</div>
+        </div>
+        <div class="sb-row">
+          <div class="sb-row-label">X — BERABERLİK</div>
+          <div class="sb-row-result">Beraberlik</div>
+          <div class="sb-row-odds">${sb.draw_odds}</div>
+          <div class="sb-row-bm">${sb.draw_bm}</div>
+          <div class="sb-row-stake">→ ${sb.draw_stake} birim</div>
+        </div>
+        <div class="sb-row">
+          <div class="sb-row-label">2 — DEPLASMan</div>
+          <div class="sb-row-result">${sb.away}</div>
+          <div class="sb-row-odds">${sb.away_odds}</div>
+          <div class="sb-row-bm">${sb.away_bm}</div>
+          <div class="sb-row-stake">→ ${sb.away_stake} birim</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
-function setFilter(f,e){
-  currentFilter=f;
+function updateStats(st){
+  document.getElementById('sv-total').textContent=valueBets.length||'0';
+  document.getElementById('sv-best').textContent=valueBets.length?('%'+valueBets[0].value_pct):'—';
+  document.getElementById('sv-time').textContent=st.last_check||'—';
+  document.getElementById('sv-threshold').textContent='%'+st.min_value;
+  document.getElementById('ss-total').textContent=sureBets.length||'0';
+  document.getElementById('ss-best').textContent=sureBets.length?('%'+sureBets[0].profit_pct):'—';
+  document.getElementById('ss-time').textContent=st.last_check||'—';
+  document.getElementById('ss-threshold').textContent='%'+st.min_profit;
+  document.getElementById('last-check-hdr').textContent=st.last_check||'—';
+  document.getElementById('badge-value').textContent=valueBets.length;
+  document.getElementById('badge-sure').textContent=sureBets.length;
+}
+
+function setVFilter(f,el){
+  vFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  if(e)e.target.classList.add('active');
-  renderBets();
+  if(el)el.classList.add('active');
+  renderValue();
 }
 
-function setSort(v){currentSort=v;renderBets();}
+async function setMinValue(v,el){
+  document.querySelectorAll('.s-box .ctrl-btn').forEach(b=>{if(['%3','%5','%10','%15'].includes(b.textContent))b.classList.remove('active')});
+  if(el)el.classList.add('active');
+  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({min_value:v})});
+  document.getElementById('sv-threshold').textContent='%'+v;
+}
+
+async function setMinProfit(v,el){
+  document.querySelectorAll('.s-box .ctrl-btn').forEach(b=>{if(['%0.5','%1','%2','%3'].includes(b.textContent))b.classList.remove('active')});
+  if(el)el.classList.add('active');
+  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({min_profit:v})});
+  document.getElementById('ss-threshold').textContent='%'+v;
+}
+
+async function setInterval2(s,el){
+  const labels={1800:'30dk',3600:'1sa',7200:'2sa',21600:'6sa'};
+  document.querySelectorAll('.s-box .ctrl-btn').forEach(b=>{if(Object.values(labels).includes(b.textContent))b.classList.remove('active')});
+  if(el)el.classList.add('active');
+  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({interval:s})});
+}
 
 async function toggleMonitor(){
   const action=monitoring?'stop':'start';
@@ -314,63 +421,35 @@ async function toggleMonitor(){
   monitoring=!monitoring;
   const btn=document.getElementById('btn-monitor');
   const bar=document.getElementById('status-bar');
-  if(monitoring){btn.textContent='◼ DURDUR';btn.className='live';bar.style.display='flex';startPoll();}
-  else{btn.textContent='▶ OTOMATİK';btn.className='';bar.style.display='none';stopPoll();}
+  if(monitoring){btn.textContent='◼ DURDUR';btn.className='hbtn red';bar.style.display='flex';startPoll();}
+  else{btn.textContent='▶ OTOMATİK';btn.className='hbtn';bar.style.display='none';stopPoll();}
 }
 
-function startPoll(){pollTimer=setInterval(pollState,10000);pollState();}
+function startPoll(){pollTimer=setInterval(()=>loadAll(),15000);}
 function stopPoll(){clearInterval(pollTimer);}
 
-async function pollState(){
-  const res=await fetch('/api/state');
-  const s=await res.json();
-  document.getElementById('last-check').textContent=s.last_check||'—';
-  document.getElementById('stat-time').textContent=s.last_check||'—';
-  document.getElementById('stat-threshold').textContent='%'+s.min_value;
-  if(s.last_check) await loadBets();
+async function loadConfig(){
+  const d=await(await fetch('/api/config')).json();
+  document.getElementById('si-odds-dot').className='si-dot '+(d.has_odds?'ok':'err');
+  document.getElementById('si-odds-txt').textContent=d.has_odds?'Bağlı':'API key eksik';
+  document.getElementById('si-tg-dot').className='si-dot '+((d.has_token&&d.has_chat)?'ok':'err');
+  document.getElementById('si-tg-txt').textContent=(d.has_token&&d.has_chat)?'Bağlı':'Ayarlanmamış';
 }
 
-async function setMinValue(v){
-  document.querySelectorAll('.ctrl-btn').forEach(b=>{if(b.textContent==='%'+v)b.classList.add('active');else if(['%3','%5','%10','%15'].includes(b.textContent))b.classList.remove('active');});
-  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({min_value:v})});
-  document.getElementById('stat-threshold').textContent='%'+v;
-}
-
-async function setInterval2(s){
-  const labels={1800:'30dk',3600:'1 saat',7200:'2 saat',21600:'6 saat'};
-  document.querySelectorAll('.ctrl-btn').forEach(b=>{if(b.textContent===labels[s])b.classList.add('active');else if(Object.values(labels).includes(b.textContent))b.classList.remove('active');});
-  await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({interval:s})});
-}
-
-async function testTelegram(){
+async function testTg(){
   const btn=document.getElementById('btn-test');
   btn.textContent='⏳';
   try{
-    const res=await fetch('/api/test-telegram',{method:'POST'});
-    const d=await res.json();
-    if(d.ok){btn.textContent='✓ GELDI';btn.className='btn-test ok';}
-    else throw new Error(d.error);
-  }catch(e){btn.textContent='✗ HATA';btn.className='btn-test err';}
+    const d=await(await fetch('/api/test-telegram',{method:'POST'})).json();
+    if(d.ok){btn.textContent='✓ GELDİ';btn.className='btn-test ok';}
+    else throw 0;
+  }catch{btn.textContent='✗ HATA';btn.className='btn-test err';}
   setTimeout(()=>{btn.textContent='TEST';btn.className='btn-test';},3000);
 }
 
-async function loadConfig(){
-  const res=await fetch('/api/config');
-  const d=await res.json();
-  // Odds API
-  const oddsDot=document.getElementById('si-odds-dot');
-  const oddsTxt=document.getElementById('si-odds-txt');
-  if(d.has_odds){oddsDot.className='si-dot ok';oddsTxt.textContent='Bağlı';}
-  else{oddsDot.className='si-dot err';oddsTxt.textContent='API key eksik';}
-  // Telegram
-  const tgDot=document.getElementById('si-tg-dot');
-  const tgTxt=document.getElementById('si-tg-txt');
-  if(d.has_token&&d.has_chat){tgDot.className='si-dot ok';tgTxt.textContent='Bağlı';}
-  else{tgDot.className='si-dot err';tgTxt.textContent='Ayarlanmamış';}
-}
-
 loadConfig();
-loadBets();
+loadBookmakers();
+loadAll();
 </script>
 </body>
 </html>
